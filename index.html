@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daphnie App</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23080808'/><ellipse cx='38' cy='62' rx='10' ry='7' transform='rotate(-25 38 62)' fill='%23c8ff00'/><ellipse cx='62' cy='54' rx='10' ry='7' transform='rotate(-25 62 54)' fill='%23c8ff00'/><line x1='47' y1='58' x2='47' y2='35' stroke='%23c8ff00' stroke-width='3.5'/><line x1='71' y1='50' x2='71' y2='27' stroke='%23c8ff00' stroke-width='3.5'/><line x1='47' y1='35' x2='71' y2='27' stroke='%23c8ff00' stroke-width='4'/></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Syne:wght@300;400;500&family=Syne+Mono&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:#f5f2ed; --surface:#fff; --surface2:#f0ede8; --border:#e0dbd3;
+      --text:#1a1814; --muted:#8a847a; --accent:#1a1814; --lime:#c8f53a;
+      --green:#16a34a; --red:#dc2626; --orange:#d97706;
+    }
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;font-weight:300;min-height:100vh;}
+
+    /* NAV */
+    nav{display:flex;align-items:center;justify-content:space-between;padding:20px 48px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
+    .nav-logo{font-family:'Playfair Display',serif;font-size:22px;}
+    .nav-links{display:flex;gap:28px;align-items:center;}
+    .nav-links a{color:var(--muted);font-size:13px;text-decoration:none;text-transform:uppercase;letter-spacing:0.08em;transition:color 0.2s;}
+    .nav-links a:hover{color:var(--text);}
+    .nav-cta{background:var(--accent);color:#fff!important;padding:10px 20px;border-radius:4px;}
+
+    /* HERO */
+    .hero{display:grid;grid-template-columns:1fr 1fr;min-height:80vh;}
+    .hero-left{padding:80px 64px;display:flex;flex-direction:column;justify-content:center;background:var(--surface);border-right:1px solid var(--border);}
+    .hero-eyebrow{font-family:'Syne Mono',monospace;font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:28px;display:flex;align-items:center;gap:10px;}
+    .hero-eyebrow::before{content:'';width:32px;height:1px;background:var(--muted);}
+    h1{font-family:'Playfair Display',serif;font-size:clamp(44px,5vw,72px);line-height:1.05;letter-spacing:-0.02em;margin-bottom:24px;}
+    h1 em{font-style:italic;color:var(--muted);}
+    .hero-sub{font-size:15px;color:var(--muted);line-height:1.75;max-width:400px;margin-bottom:44px;}
+    .hero-actions{display:flex;gap:14px;flex-wrap:wrap;}
+    .btn-dark{display:inline-flex;align-items:center;gap:10px;background:var(--accent);color:#fff;border:none;border-radius:4px;padding:13px 26px;font-size:13px;cursor:pointer;text-decoration:none;font-family:'Syne',sans-serif;letter-spacing:0.05em;text-transform:uppercase;transition:opacity 0.2s;}
+    .btn-dark:hover{opacity:0.85;}
+    .btn-outline{display:inline-flex;align-items:center;gap:8px;background:transparent;color:var(--text);border:1px solid var(--border);border-radius:4px;padding:12px 22px;font-size:13px;cursor:pointer;text-decoration:none;font-family:'Syne',sans-serif;letter-spacing:0.05em;text-transform:uppercase;transition:all 0.2s;}
+    .btn-outline:hover{border-color:var(--text);}
+    .hero-right{padding:80px 64px;display:flex;flex-direction:column;justify-content:center;background:var(--surface2);}
+    .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-bottom:32px;}
+    .stat-box{background:var(--surface);padding:24px;}
+    .stat-box:nth-child(odd){background:var(--accent);color:#fff;}
+    .stat-box:nth-child(odd) .stat-label{color:rgba(255,255,255,0.6);}
+    .stat-num{font-family:'Playfair Display',serif;font-size:36px;letter-spacing:-0.02em;margin-bottom:4px;}
+    .stat-label{font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);}
+    .platform-row{display:flex;gap:10px;flex-wrap:wrap;}
+    .platform-badge{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:100px;padding:8px 14px;font-size:12px;}
+
+    /* SECTIONS */
+    .section{padding:72px 48px;max-width:1100px;margin:0 auto;}
+    .section-eyebrow{font-family:'Syne Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;}
+    .section-title{font-family:'Playfair Display',serif;font-size:clamp(28px,3vw,40px);letter-spacing:-0.02em;margin-bottom:40px;line-height:1.1;}
+    .section-bg{background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+
+    /* APP SHELL */
+    .app-shell{border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.07);}
+    .app-titlebar{background:#2a2a2a;padding:11px 16px;display:flex;align-items:center;gap:8px;}
+    .dot{width:12px;height:12px;border-radius:50%;}
+    .dot-r{background:#ff5f57;}.dot-y{background:#febc2e;}.dot-g{background:#28c840;}
+    .titlebar-url{flex:1;text-align:center;font-family:'Syne Mono',monospace;font-size:11px;color:#888;}
+    .app-body{display:grid;grid-template-columns:200px 1fr;min-height:560px;}
+    .app-sidebar{background:#1a1a1a;padding:20px 0;border-right:1px solid #333;}
+    .sidebar-label{font-family:'Syne Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#555;padding:14px 18px 6px;}
+    .sidebar-item{display:flex;align-items:center;gap:10px;padding:9px 18px;font-size:12px;color:#888;cursor:pointer;transition:all 0.2s;}
+    .sidebar-item:hover,.sidebar-item.active{background:rgba(255,255,255,0.05);color:#fff;}
+    .sidebar-item.active{color:var(--lime);border-left:2px solid var(--lime);}
+    .app-main{background:var(--bg);padding:24px;overflow:auto;}
+
+    /* STEP TABS */
+    .step-tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:24px;}
+    .step-tab{padding:10px 20px;font-size:12px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;transition:all 0.2s;display:flex;align-items:center;gap:6px;}
+    .step-tab.active{color:var(--text);border-bottom-color:var(--accent);}
+    .step-tab.completed{color:var(--green);}
+    .step-num-badge{width:18px;height:18px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:9px;font-family:'Syne Mono',monospace;}
+    .step-tab.active .step-num-badge{background:var(--accent);color:#fff;}
+    .step-tab.completed .step-num-badge{background:var(--green);color:#fff;}
+
+    .step-panel{display:none;}
+    .step-panel.active{display:block;}
+
+    /* UPLOAD PANEL */
+    .upload-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;}
+    .drop-zone{border:1.5px dashed var(--border);border-radius:8px;padding:28px 20px;text-align:center;cursor:pointer;transition:all 0.3s;background:var(--surface);position:relative;}
+    .drop-zone:hover{border-color:var(--accent);background:var(--surface2);}
+    .drop-zone.uploaded{border-color:var(--green);border-style:solid;background:rgba(22,163,74,0.04);}
+    .drop-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;z-index:1;}
+    .drop-zone .btn-sm, .drop-zone .btn-sm-outline{position:relative;z-index:2;}
+    .drop-icon{font-size:24px;margin-bottom:10px;display:block;}
+    .drop-zone h4{font-size:13px;font-weight:500;margin-bottom:5px;}
+    .drop-zone p{font-size:11px;color:var(--muted);}
+    .file-added{margin-top:10px;background:rgba(22,163,74,0.1);border-radius:5px;padding:7px 10px;font-size:11px;color:var(--green);text-align:left;}
+    .btn-sm{background:var(--accent);color:#fff;border:none;border-radius:4px;padding:7px 14px;font-size:11px;cursor:pointer;font-family:'Syne',sans-serif;letter-spacing:0.05em;text-transform:uppercase;margin-top:10px;display:inline-block;}
+    .btn-sm-outline{background:transparent;color:var(--text);border:1px solid var(--border);border-radius:4px;padding:6px 12px;font-size:11px;cursor:pointer;font-family:'Syne',sans-serif;margin-top:8px;display:inline-block;}
+    .next-btn{background:var(--accent);color:#fff;border:none;border-radius:4px;padding:11px 24px;font-size:13px;cursor:pointer;font-family:'Syne',sans-serif;letter-spacing:0.05em;text-transform:uppercase;transition:opacity 0.2s;margin-top:16px;}
+    .next-btn:disabled{opacity:0.35;cursor:not-allowed;}
+
+    /* POST FORM */
+    .creator-info-bar{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 16px;margin-bottom:20px;}
+    .creator-avatar{width:36px;height:36px;border-radius:50%;background:#000;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+    .creator-details{flex:1;}
+    .creator-name{font-size:13px;font-weight:500;}
+    .creator-handle{font-size:11px;color:var(--muted);}
+    .creator-status{font-size:11px;padding:3px 10px;border-radius:100px;background:rgba(22,163,74,0.1);color:var(--green);font-family:'Syne Mono',monospace;}
+
+    .form-group{margin-bottom:16px;}
+    .form-label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:6px;}
+    .form-input{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:6px;font-size:13px;font-family:'Syne',sans-serif;background:var(--surface);color:var(--text);outline:none;transition:border-color 0.2s;}
+    .form-input:focus{border-color:var(--accent);}
+    .form-select{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:6px;font-size:13px;font-family:'Syne',sans-serif;background:var(--surface);color:var(--text);outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238a847a' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;cursor:pointer;}
+    .form-select:focus{border-color:var(--accent);}
+    .form-select option[value=""]{color:var(--muted);}
+
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+
+    /* CHECKBOXES */
+    .checkbox-group{background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+    .checkbox-item{display:flex;align-items:center;gap:12px;padding:11px 14px;border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.15s;}
+    .checkbox-item:last-child{border-bottom:none;}
+    .checkbox-item:hover{background:var(--surface2);}
+    .checkbox-item.disabled-item{opacity:0.45;cursor:not-allowed;}
+    .checkbox-item input[type=checkbox]{width:15px;height:15px;cursor:pointer;accent-color:var(--accent);}
+    .checkbox-item input[type=checkbox]:disabled{cursor:not-allowed;}
+    .checkbox-text{flex:1;}
+    .checkbox-label{font-size:13px;font-weight:400;}
+    .checkbox-sublabel{font-size:11px;color:var(--muted);margin-top:1px;}
+    .disabled-badge{font-size:10px;padding:2px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:100px;color:var(--muted);font-family:'Syne Mono',monospace;}
+
+    /* COMMERCIAL DISCLOSURE */
+    .disclosure-section{background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:16px;}
+    .disclosure-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer;border-bottom:1px solid var(--border);}
+    .disclosure-header-text h4{font-size:13px;font-weight:500;margin-bottom:2px;}
+    .disclosure-header-text p{font-size:11px;color:var(--muted);}
+    .toggle{width:40px;height:22px;background:var(--border);border-radius:100px;position:relative;cursor:pointer;transition:background 0.2s;flex-shrink:0;}
+    .toggle.on{background:var(--accent);}
+    .toggle::after{content:'';position:absolute;width:16px;height:16px;background:#fff;border-radius:50%;top:3px;left:3px;transition:transform 0.2s;}
+    .toggle.on::after{transform:translateX(18px);}
+    .disclosure-body{display:none;padding:14px 16px;}
+    .disclosure-body.visible{display:block;}
+    .brand-checkbox{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
+    .brand-checkbox:last-child{border-bottom:none;}
+    .brand-checkbox input{margin-top:2px;width:14px;height:14px;accent-color:var(--accent);}
+    .brand-checkbox-text strong{display:block;font-size:13px;margin-bottom:2px;}
+    .brand-checkbox-text span{font-size:11px;color:var(--muted);}
+    .disclosure-prompt{margin-top:10px;padding:8px 12px;background:rgba(217,119,6,0.1);border:1px solid rgba(217,119,6,0.2);border-radius:6px;font-size:12px;color:var(--orange);display:none;}
+    .disclosure-prompt.visible{display:block;}
+
+    /* VIDEO PREVIEW */
+    .preview-box{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:16px;display:flex;gap:14px;align-items:center;}
+    .preview-thumb{width:48px;height:72px;background:#000;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+    .preview-info h4{font-size:13px;font-weight:500;margin-bottom:4px;}
+    .preview-info p{font-size:11px;color:var(--muted);}
+    .preview-note{font-size:11px;color:var(--orange);margin-top:6px;display:flex;align-items:center;gap:4px;}
+
+    /* DECLARATION */
+    .declaration{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:12px 14px;font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.5;}
+    .declaration a{color:var(--accent);text-decoration:underline;}
+
+    /* STATUS */
+    .post-status{display:none;margin-top:16px;}
+    .post-status.visible{display:block;}
+    .status-row{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:6px;margin-bottom:6px;font-size:12px;}
+    .status-platform{display:flex;align-items:center;gap:8px;}
+    .status-badge{font-size:10px;padding:2px 8px;border-radius:100px;background:var(--surface2);color:var(--muted);font-family:'Syne Mono',monospace;}
+    .status-badge.uploading{background:rgba(200,245,58,0.15);color:#6b8f00;animation:blink 1s infinite;}
+    .status-badge.done{background:rgba(22,163,74,0.1);color:var(--green);}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:0.5}}
+    .processing-note{display:none;font-size:12px;color:var(--muted);padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:6px;margin-top:8px;}
+    .processing-note.visible{display:block;}
+    .post-success{display:none;text-align:center;padding:20px;background:rgba(22,163,74,0.06);border:1px solid rgba(22,163,74,0.2);border-radius:8px;margin-top:12px;}
+    .post-success.visible{display:block;}
+    .post-success h4{font-size:15px;font-weight:500;color:var(--green);margin-bottom:4px;}
+    .post-success p{font-size:12px;color:var(--muted);}
+
+    /* CONNECT SECTION */
+    .connect-section{padding:72px 48px;background:var(--surface2);border-top:1px solid var(--border);}
+    .connect-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start;}
+    .connect-text h2{font-family:'Playfair Display',serif;font-size:clamp(28px,3.5vw,40px);letter-spacing:-0.02em;margin-bottom:16px;line-height:1.1;}
+    .connect-text>p{color:var(--muted);font-size:15px;line-height:1.75;margin-bottom:28px;}
+    .perm-list{list-style:none;margin-bottom:28px;}
+    .perm-list li{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--border);}
+    .perm-icon{width:34px;height:34px;background:var(--surface);border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+    .perm-text strong{display:block;font-size:13px;font-weight:500;margin-bottom:2px;}
+    .perm-text span{font-size:12px;color:var(--muted);line-height:1.5;}
+    .connect-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:40px 36px;text-align:center;position:sticky;top:100px;box-shadow:0 8px 32px rgba(0,0,0,0.06);}
+    .card-icon{width:60px;height:60px;background:#080808;border-radius:16px;margin:0 auto 18px;display:flex;align-items:center;justify-content:center;}
+    .card-icon svg{width:32px;height:32px;}
+    .connect-card h3{font-family:'Playfair Display',serif;font-size:20px;margin-bottom:8px;}
+    .connect-card p{color:var(--muted);font-size:13px;margin-bottom:24px;line-height:1.6;}
+    .tiktok-btn{display:flex;align-items:center;justify-content:center;gap:10px;background:#1a1a1a;color:#fff;border:none;border-radius:8px;padding:14px 22px;font-size:14px;font-weight:500;cursor:pointer;width:100%;font-family:'Syne',sans-serif;transition:all 0.2s;text-decoration:none;}
+    .tiktok-btn:hover{background:#333;transform:translateY(-1px);}
+    .tiktok-btn svg{width:17px;height:17px;}
+    .connect-fine{font-size:11px;color:var(--muted);margin-top:12px;line-height:1.6;}
+    .connect-success{display:none;margin-top:14px;padding:11px 14px;background:rgba(22,163,74,0.08);border:1px solid rgba(22,163,74,0.2);border-radius:7px;font-size:13px;color:var(--green);}
+    .connect-success.visible{display:block;}
+
+    footer{border-top:1px solid var(--border);padding:28px 48px;display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:12px;background:var(--surface);}
+    footer a{color:var(--muted);text-decoration:none;transition:color 0.2s;}
+    footer a:hover{color:var(--text);}
+
+    @media(max-width:900px){
+      nav{padding:16px 24px;}
+      .hero{grid-template-columns:1fr;}
+      .hero-right{display:none;}
+      .section{padding:48px 24px;}
+      .app-body{grid-template-columns:1fr;}
+      .app-sidebar{display:none;}
+      .upload-grid,.form-grid{grid-template-columns:1fr;}
+      .connect-inner{grid-template-columns:1fr;gap:40px;}
+      .connect-card{position:static;}
+      .connect-section{padding:48px 24px;}
+      footer{padding:24px;flex-direction:column;gap:12px;}
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">Daphnie App</div>
+  <div class="nav-links">
+    <a href="#post">Post to Socials</a>
+    <a href="privacy-policy.html">Privacy</a>
+    <a href="terms-of-service.html">Terms</a>
+    <a href="#connect" class="nav-cta">Connect Accounts</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-left">
+    <div class="hero-eyebrow">Music Distribution Platform</div>
+    <h1>Post once.<br><em>Reach everywhere.</em></h1>
+    <p class="hero-sub">Daphnie App distributes your original music videos to TikTok, Instagram Reels, and YouTube Shorts — automatically, on your schedule.</p>
+    <div class="hero-actions">
+      <a href="#connect" class="btn-dark">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.31 6.31 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.75a4.85 4.85 0 01-1.01-.06z"/></svg>
+        Connect Your Accounts
+      </a>
+      <a href="#post" class="btn-outline">See how it works</a>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="stat-grid">
+      <div class="stat-box"><div class="stat-num">∞</div><div class="stat-label">Posts scheduled</div></div>
+      <div class="stat-box"><div class="stat-num">3</div><div class="stat-label">Platforms</div></div>
+      <div class="stat-box"><div class="stat-num">0</div><div class="stat-label">Manual steps</div></div>
+      <div class="stat-box"><div class="stat-num">100%</div><div class="stat-label">Original quality</div></div>
+    </div>
+    <p style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px;">Posts to</p>
+    <div class="platform-row">
+      <div class="platform-badge">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.31 6.31 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.75a4.85 4.85 0 01-1.01-.06z"/></svg>
+        TikTok
+      </div>
+      <div class="platform-badge">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="#E1306C"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+        Instagram
+      </div>
+      <div class="platform-badge">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="#FF0000"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+        YouTube
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- POST TO TIKTOK -->
+<div class="section-bg" id="post">
+  <div class="section" style="max-width:1100px;">
+    <div class="section-eyebrow">Post to Socials</div>
+    <h2 class="section-title">Upload and publish your video</h2>
+    <div class="app-shell">
+      <div class="app-titlebar">
+        <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+        <div class="titlebar-url">daphnieapp.github.io</div>
+      </div>
+      <div class="app-body">
+        <div class="app-sidebar">
+          <div class="sidebar-label">Menu</div>
+          <div class="sidebar-item active">📤 Post to Socials</div>
+          <div class="sidebar-item">📅 Schedule</div>
+          <div class="sidebar-label">Account</div>
+          <div class="sidebar-item">🔐 Connected Accounts</div>
+          <div class="sidebar-item">⚙️ Settings</div>
+        </div>
+        <div class="app-main">
+
+          <!-- Step tabs -->
+          <div class="step-tabs">
+            <div class="step-tab active" id="tab1" onclick="goStep(1)"><div class="step-num-badge" id="badge1">1</div> Upload</div>
+            <div class="step-tab" id="tab2" onclick="goStep(2)"><div class="step-num-badge" id="badge2">2</div> Post Details</div>
+            <div class="step-tab" id="tab3" onclick="goStep(3)"><div class="step-num-badge" id="badge3">3</div> Review & Post</div>
+          </div>
+
+          <!-- STEP 1: UPLOAD -->
+          <div class="step-panel active" id="step1">
+            <div class="upload-grid">
+              <div class="drop-zone" id="videoZone">
+                <input type="file" accept="video/*" multiple onchange="handleVideo(event)">
+                <span class="drop-icon">🎬</span>
+                <h4>Drop video file here</h4>
+                <p>MP4 or MOV, up to 500MB</p>
+                <button class="btn-sm" onclick="document.querySelector('#videoZone input').click();event.stopPropagation()">Browse Files</button>
+                <div class="file-added" id="videoAdded" style="display:none"></div>
+              </div>
+              <div class="drop-zone" id="csvZone">
+                <input type="file" accept=".csv" onchange="handleCsv(event)">
+                <span class="drop-icon">📋</span>
+                <h4>Drop schedule CSV here</h4>
+                <p>Captions, hashtags, post times</p>
+                <button class="btn-sm-outline" id="dlBtn" onclick="downloadTemplate(event); event.stopPropagation(); event.preventDefault();">⬇ Download Template</button>
+                <button class="btn-sm" style="margin-left:6px; position:relative; z-index:2;" onclick="event.stopPropagation(); event.preventDefault(); document.querySelector('#csvZone input').click();">Upload CSV</button>
+                <div class="file-added" id="csvAdded" style="display:none"></div>
+              </div>
+            </div>
+            <button class="next-btn" id="nextBtn1" onclick="goStep(2)" disabled>Continue to Post Details →</button>
+          </div>
+
+          <!-- STEP 2: POST DETAILS -->
+          <div class="step-panel" id="step2">
+
+            <!-- Creator info (from creator_info API) -->
+            <div class="creator-info-bar">
+              <div style="width:40px;height:40px;border-radius:50%;overflow:hidden;flex-shrink:0;background:#111;border:2px solid var(--border);">
+                <img id="creatorAvatar" src="https://ui-avatars.com/api/?name=Daphnie&background=c8f53a&color=000&size=40&bold=true" style="width:100%;height:100%;object-fit:cover;" alt="Profile">
+              </div>
+              <div class="creator-details">
+                <div class="creator-name" id="creatorName">Daphnie</div>
+                <div class="creator-handle" id="creatorHandle">@probablydaphnie</div>
+              </div>
+              <div class="creator-status">✓ Ready to post</div>
+            </div>
+
+            <!-- Video preview -->
+            <div class="preview-box">
+              <div class="preview-thumb">🎬</div>
+              <div class="preview-info">
+                <h4 id="previewName">Your video</h4>
+                <p id="previewSize">—</p>
+                <div class="preview-note">⏱ Content may take a few minutes to process and appear on your profile after posting.</div>
+              </div>
+            </div>
+
+            <div class="form-grid">
+              <div class="form-group" style="grid-column:1/-1">
+                <label class="form-label">Title / Caption <span style="color:var(--muted);font-size:10px">(editable)</span></label>
+                <textarea class="form-input" id="titleInput" rows="3" placeholder="Write your caption here with #hashtags"></textarea>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">First Comment <span style="color:var(--muted);font-size:10px">posted on all platforms after publishing</span></label>
+              <input type="text" class="form-input" id="commentInput" placeholder="e.g. What's your favourite crash out song?">
+            </div>
+
+            <div style="height:1px;background:var(--border);margin:20px 0;"></div>
+            <div class="form-group">
+              <label class="form-label" style="font-size:13px;text-transform:none;letter-spacing:0;color:var(--text);font-weight:500;margin-bottom:12px;display:flex;align-items:center;gap:8px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.31 6.31 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.75a4.85 4.85 0 01-1.01-.06z"/></svg>
+                TikTok Settings
+              </label>
+              <div class="form-group">
+                <label class="form-label">Privacy Status <span style="color:var(--red);font-size:10px">* required</span></label>
+                <select class="form-select" id="privacySelect">
+                  <option value="" disabled selected>Select privacy...</option>
+                  <option value="PUBLIC_TO_EVERYONE">Public</option>
+                  <option value="MUTUAL_FOLLOW_FRIENDS">Friends only</option>
+                  <option value="SELF_ONLY">Private</option>
+                </select>
+              </div>
+              <label class="form-label">Interactions — none enabled by default</label>
+              <div class="checkbox-group">
+                <label class="checkbox-item"><input type="checkbox" id="allowComment"><div class="checkbox-text"><div class="checkbox-label">Allow Comments</div></div></label>
+                <label class="checkbox-item"><input type="checkbox" id="allowDuet"><div class="checkbox-text"><div class="checkbox-label">Allow Duet</div></div></label>
+                <label class="checkbox-item"><input type="checkbox" id="allowStitch"><div class="checkbox-text"><div class="checkbox-label">Allow Stitch</div></div></label>
+              </div>
+            </div>
+
+            <div style="height:1px;background:var(--border);margin:20px 0;"></div>
+
+            <div class="form-group">
+              <label class="form-label" style="font-size:13px;text-transform:none;letter-spacing:0;color:var(--text);font-weight:500;margin-bottom:12px;display:flex;align-items:center;gap:8px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="#E1306C"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+                Instagram Reels Settings
+              </label>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label">Reel Type</label>
+                  <select class="form-select" id="reelType">
+                    <option value="TRIAL">Trial Reel — shown to non-followers first</option>
+                    <option value="REGULAR">Regular Reel</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Share to Feed</label>
+                  <select class="form-select" id="shareToFeed">
+                    <option value="false">Reels tab only</option>
+                    <option value="true">Reels tab and main grid</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Instagram Caption <span style="color:var(--muted);font-size:10px">leave blank to use TikTok caption</span></label>
+                <textarea class="form-input" id="igCaption" rows="2" placeholder="Optional separate caption for Instagram..."></textarea>
+              </div>
+
+            </div>
+
+            <div style="height:1px;background:var(--border);margin:20px 0;"></div>
+
+            <div class="form-group">
+              <label class="form-label" style="font-size:13px;text-transform:none;letter-spacing:0;color:var(--text);font-weight:500;margin-bottom:12px;display:flex;align-items:center;gap:8px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="#FF0000"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                YouTube Shorts Settings
+              </label>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label">Privacy</label>
+                  <select class="form-select" id="ytPrivacy">
+                    <option value="public">Public</option>
+                    <option value="unlisted">Unlisted</option>
+                    <option value="private">Private</option>
+                  </select>
+                </div>
+
+              </div>
+              <div class="form-group">
+                <label class="form-label">YouTube Title <span style="color:var(--muted);font-size:10px">leave blank to use TikTok caption (max 100 chars)</span></label>
+                <input type="text" class="form-input" id="ytTitle" placeholder="Optional separate title for YouTube..." maxlength="100">
+              </div>
+            </div>
+
+            <button class="next-btn" id="nextBtn2" onclick="goStep(3)">Continue to Review</button>
+          </div>
+
+          <!-- STEP 3: REVIEW & POST -->
+          <div class="step-panel" id="step3">
+
+            <!-- Commercial content disclosure -->
+            <div class="disclosure-section">
+              <div class="disclosure-header" onclick="toggleDisclosure()">
+                <div class="disclosure-header-text">
+                  <h4>Content Disclosure</h4>
+                  <p>Indicate if this content promotes yourself, a brand, product or service</p>
+                </div>
+                <div class="toggle" id="disclosureToggle"></div>
+              </div>
+              <div class="disclosure-body" id="disclosureBody">
+                <label class="brand-checkbox">
+                  <input type="checkbox" id="yourBrand" onchange="updateDisclosure()">
+                  <div class="brand-checkbox-text">
+                    <strong>Your Brand</strong>
+                    <span>You are promoting yourself or your own business. Content will be classified as Brand Organic.</span>
+                  </div>
+                </label>
+                <label class="brand-checkbox">
+                  <input type="checkbox" id="brandedContent" onchange="updateDisclosure()">
+                  <div class="brand-checkbox-text">
+                    <strong>Branded Content</strong>
+                    <span>You are promoting another brand or a third party. Content will be classified as Branded Content.</span>
+                  </div>
+                </label>
+                <div class="disclosure-prompt" id="disclosurePrompt"></div>
+              </div>
+            </div>
+
+            <!-- Declaration -->
+            <div class="declaration" id="declaration">
+              By posting, you agree to TikTok's <a href="https://www.tiktok.com/legal/music-usage-confirmation" target="_blank">Music Usage Confirmation</a>.
+            </div>
+
+            <!-- Post status -->
+            <div class="post-status" id="postStatus">
+              <div class="status-row">
+                <div class="status-platform">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.31 6.31 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.75a4.85 4.85 0 01-1.01-.06z"/></svg>
+                  TikTok
+                </div>
+                <span class="status-badge" id="ttStatus">Waiting</span>
+              </div>
+              <div class="status-row">
+                <div class="status-platform">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="#E1306C"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+                  Instagram Reels
+                </div>
+                <span class="status-badge" id="igStatus">Waiting</span>
+              </div>
+              <div class="status-row">
+                <div class="status-platform">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="#FF0000"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                  YouTube Shorts
+                </div>
+                <span class="status-badge" id="ytStatus">Waiting</span>
+              </div>
+              <div class="processing-note" id="processingNote">
+                ⏱ Your content has been submitted. It may take a few minutes to process and appear on your TikTok profile.
+              </div>
+            </div>
+
+            <div class="post-success" id="postSuccess">
+              <h4>✓ Published successfully</h4>
+              <p>Your video is live on TikTok, Instagram and YouTube. It may take a few minutes to appear on your profiles.</p>
+            </div>
+
+            <button class="next-btn" id="postBtn" onclick="startPosting()">Post to All Platforms</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CONNECT -->
+<section class="connect-section" id="connect">
+  <div class="connect-inner">
+    <div class="connect-text">
+      <div class="section-eyebrow">Account Setup</div>
+      <h2>Connect your accounts</h2>
+      <p>Connect your TikTok, Instagram, and YouTube accounts to enable automatic publishing across all three platforms.</p>
+      <ul class="perm-list">
+        <li>
+          <div class="perm-icon">🎵</div>
+          <div class="perm-text"><strong>Publish videos to all platforms</strong><span>Posts your original music video clips to TikTok, Instagram Reels, and YouTube Shorts on your schedule.</span></div>
+        </li>
+        <li>
+          <div class="perm-icon">🔒</div>
+          <div class="perm-text"><strong>Verify your identity</strong><span>Confirms which account you're connecting on each platform. No personal data is stored or shared.</span></div>
+        </li>
+        <li>
+          <div class="perm-icon">🚫</div>
+          <div class="perm-text"><strong>What we don't access</strong><span>We never read your messages, follower lists, analytics, or any data beyond what's needed to publish your content.</span></div>
+        </li>
+      </ul>
+      <p style="font-size:12px;color:var(--muted);">Disconnect at any time: TikTok → Settings → Security → Authorised Apps. Instagram → Settings → Apps and Websites. YouTube → Google Account → Security → Third-party apps.</p>
+    </div>
+    <div class="connect-card">
+      <div class="card-icon">
+        <svg viewBox="0 0 24 24" fill="#c8ff00"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.31 6.31 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.75a4.85 4.85 0 01-1.01-.06z"/></svg>
+      </div>
+      <h3>Daphnie App</h3>
+      <p>Connect TikTok, Instagram, and YouTube to start publishing your music automatically across all platforms.</p>
+      <div style="border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:10px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+          <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.31 6.31 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.75a4.85 4.85 0 01-1.01-.06z"/></svg>
+            TikTok
+          </div>
+        </div>
+        <a class="tiktok-btn" href="#" id="tiktokLoginBtn" onclick="doLogin(event)" style="padding:10px;font-size:13px;">
+          <svg viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px;"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.31 6.31 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.75a4.85 4.85 0 01-1.01-.06z"/></svg>
+          Connect with TikTok
+        </a>
+      </div>
+
+      <div style="border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-top:10px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+          <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="#E1306C"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+            Instagram
+          </div>
+        </div>
+        <button id="igConnectBtn" onclick="alert('Instagram is connected via your Meta Business account. To reconnect, visit Meta Business Suite.')" style="width:100%;background:#16a34a;color:#fff;border:none;border-radius:8px;padding:12px;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:10px;">
+          ✓ Instagram Connected
+        </button>
+      </div>
+
+      <div style="border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-top:10px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+          <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="#FF0000"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+            YouTube
+          </div>
+        </div>
+        <button id="ytConnectBtn" onclick="alert('YouTube is connected via your Google account. To reconnect, visit Google Account Security settings.')" style="width:100%;background:#16a34a;color:#fff;border:none;border-radius:8px;padding:12px;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:10px;">
+          ✓ YouTube Connected
+        </button>
+      </div>
+
+      <p class="connect-fine" style="margin-top:14px;">By connecting, you authorise Daphnie App to publish original music videos to your accounts. Disconnect at any time from each platform's settings.</p>
+      <div class="connect-success" id="connectSuccess">&#10003; Account connected successfully!</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div>© 2026 Daphnie App</div>
+  <div style="display:flex;gap:20px;">
+    <a href="privacy-policy.html">Privacy Policy</a>
+    <a href="terms-of-service.html">Terms of Service</a>
+  </div>
+</footer>
+
+<script>
+  const CLIENT_KEY = 'aw2r9f2oaloc9vpu';
+  const REDIRECT   = 'https://daphnieapp.github.io/';
+  let videoReady = false, csvReady = false, disclosureOn = false;
+
+  // ── Step navigation ───────────────────────────────────────────────────────
+  function goStep(n) {
+    [1,2,3].forEach(i => {
+      document.getElementById('step' + i).classList.toggle('active', i === n);
+      const tab = document.getElementById('tab' + i);
+      tab.classList.remove('active','completed');
+      if (i === n) tab.classList.add('active');
+      else if (i < n) tab.classList.add('completed');
+      document.getElementById('badge' + i).textContent = i < n ? '✓' : i;
+    });
+    if (n === 2 && document.getElementById('titleInput').value === '') {
+      document.getElementById('titleInput').value =
+        'Mid crash out. 28 by Daphnie #indierock #altrock #indiepop #electro #synthpop';
+    }
+  }
+
+  // ── File handlers ─────────────────────────────────────────────────────────
+  function handleVideo(e) {
+    const files = Array.from(e.target.files);
+    if (!files.length) return;
+    const el = document.getElementById('videoAdded');
+    el.style.display = 'block';
+    el.innerHTML = files.map(f => '🎬 ' + f.name).join('<br>');
+    document.getElementById('videoZone').classList.add('uploaded');
+    document.getElementById('previewName').textContent = files[0].name;
+    document.getElementById('previewSize').textContent =
+      (files[0].size / 1024 / 1024).toFixed(1) + ' MB · MOV/MP4 · Ready to upload';
+    videoReady = true;
+    checkStep1();
+  }
+
+  function handleCsv(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const el = document.getElementById('csvAdded');
+    el.style.display = 'block';
+    el.textContent = '📋 ' + file.name + ' loaded';
+    document.getElementById('csvZone').classList.add('uploaded');
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const rows = ev.target.result.split('\n').filter(l => l.trim()).length - 1;
+      el.textContent = '📋 ' + file.name + ' — ' + rows + ' post(s) loaded';
+      if (rows > 0) {
+        const cols = ev.target.result.split('\n')[1].split(',');
+        if (cols[3]) document.getElementById('titleInput').value = cols[3].replace(/"/g,'').trim();
+      }
+    };
+    reader.readAsText(file);
+    csvReady = true;
+    checkStep1();
+  }
+
+  function downloadTemplate(e) {
+    if (e) {
+      e.stopPropagation();
+      e.preventDefault();
+    }
+    const csv = [
+      'Date,Time,song_name,Text,Youtube Video Title,TikTok Title,First Comment Text,Youtube Video Privacy,TikTok Post Privacy,TikTok disable comments,TikTok disable duet,TikTok disable stitch,reel_type,posted,posted_at,video_path,platforms_done',
+      '2026/06/01,09:30,28,"Mid crash out. 28 by Daphnie #indierock #altrock #indiepop #electro #synthpop","Mid crash out. 28 by Daphnie #indierock #altrock #indiepop","Mid crash out. 28 by Daphnie #indierock #altrock","What\'s your favourite crash out song?",public,PUBLIC_TO_EVERYONE,FALSE,FALSE,FALSE,TRIAL,false,,28_video.mp4,',
+    ].join('\r\n');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv'}));
+    a.download = 'daphnie-schedule-template.csv';
+    a.click();
+  }
+
+  function checkStep1() {
+    document.getElementById('nextBtn1').disabled = !(videoReady && csvReady);
+  }
+
+  // ── Commercial disclosure ─────────────────────────────────────────────────
+  function toggleDisclosure() {
+    disclosureOn = !disclosureOn;
+    document.getElementById('disclosureToggle').classList.toggle('on', disclosureOn);
+    document.getElementById('disclosureBody').classList.toggle('visible', disclosureOn);
+    if (!disclosureOn) {
+      document.getElementById('yourBrand').checked = false;
+      document.getElementById('brandedContent').checked = false;
+      document.getElementById('disclosurePrompt').classList.remove('visible');
+    }
+    updateDeclaration();
+  }
+
+  function updateDisclosure() {
+    const yb = document.getElementById('yourBrand').checked;
+    const bc = document.getElementById('brandedContent').checked;
+    const prompt = document.getElementById('disclosurePrompt');
+    if (yb && bc) {
+      prompt.textContent = 'Your photo/video will be labeled as "Paid partnership"';
+      prompt.classList.add('visible');
+    } else if (bc) {
+      prompt.textContent = 'Your photo/video will be labeled as "Paid partnership"';
+      prompt.classList.add('visible');
+    } else if (yb) {
+      prompt.textContent = 'Your photo/video will be labeled as "Promotional content"';
+      prompt.classList.add('visible');
+    } else {
+      prompt.classList.remove('visible');
+    }
+    updateDeclaration();
+  }
+
+  function updateDeclaration() {
+    const bc = document.getElementById('brandedContent').checked;
+    const decl = document.getElementById('declaration');
+    if (disclosureOn && bc) {
+      decl.innerHTML = 'By posting, you agree to TikTok\'s <a href="https://www.tiktok.com/legal/branded-content-policy" target="_blank">Branded Content Policy</a> and <a href="https://www.tiktok.com/legal/music-usage-confirmation" target="_blank">Music Usage Confirmation</a>.';
+    } else {
+      decl.innerHTML = 'By posting, you agree to TikTok\'s <a href="https://www.tiktok.com/legal/music-usage-confirmation" target="_blank">Music Usage Confirmation</a>.';
+    }
+  }
+
+  // ── Posting animation ─────────────────────────────────────────────────────
+  function startPosting() {
+    const privacy = document.getElementById('privacySelect').value;
+    if (!privacy) { alert('Please select a privacy setting before posting.'); return; }
+    if (disclosureOn && !document.getElementById('yourBrand').checked && !document.getElementById('brandedContent').checked) {
+      alert('Please select at least one content disclosure option, or turn off content disclosure.'); return;
+    }
+    document.getElementById('postBtn').disabled = true;
+    document.getElementById('postBtn').style.opacity = '0.4';
+    document.getElementById('postStatus').classList.add('visible');
+    [
+      {id:'ttStatus', start:400,  done:3200},
+      {id:'igStatus', start:900,  done:5800},
+      {id:'ytStatus', start:200,  done:2600},
+    ].forEach(({id, start, done}) => {
+      setTimeout(() => {
+        document.getElementById(id).textContent = 'Uploading…';
+        document.getElementById(id).className = 'status-badge uploading';
+      }, start);
+      setTimeout(() => {
+        document.getElementById(id).textContent = 'Processing ✓';
+        document.getElementById(id).className = 'status-badge done';
+        const allDone = ['ttStatus','igStatus','ytStatus']
+          .every(i => document.getElementById(i).classList.contains('done'));
+        if (allDone) {
+          document.getElementById('processingNote').classList.add('visible');
+          setTimeout(() => document.getElementById('postSuccess').classList.add('visible'), 800);
+        }
+      }, done);
+    });
+  }
+
+  // ── TikTok OAuth ──────────────────────────────────────────────────────────
+  function doLogin(e) {
+    e.preventDefault();
+    window.location.href =
+      'https://www.tiktok.com/v2/auth/authorize/?client_key=' + CLIENT_KEY +
+      '&scope=video.publish,user.info.basic&response_type=code' +
+      '&redirect_uri=' + encodeURIComponent(REDIRECT);
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('code')) {
+    document.getElementById('connectSuccess').classList.add('visible');
+    const btn = document.getElementById('tiktokLoginBtn');
+    btn.innerHTML = '✓ &nbsp;TikTok Connected';
+    btn.style.background = '#16a34a';
+    btn.onclick = null;
+    window.history.replaceState({}, document.title, window.location.pathname);
+    setTimeout(() => document.getElementById('connect').scrollIntoView({behavior:'smooth'}), 300);
+  }
+</script>
+</body>
+</html>
