@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daphnie Insights</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23080808'/><ellipse cx='38' cy='62' rx='10' ry='7' transform='rotate(-25 38 62)' fill='%23c8ff00'/><ellipse cx='62' cy='54' rx='10' ry='7' transform='rotate(-25 62 54)' fill='%23c8ff00'/><line x1='47' y1='58' x2='47' y2='35' stroke='%23c8ff00' stroke-width='3.5'/><line x1='71' y1='50' x2='71' y2='27' stroke='%23c8ff00' stroke-width='3.5'/><line x1='47' y1='35' x2='71' y2='27' stroke='%23c8ff00' stroke-width='4'/></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Syne:wght@300;400;500&family=Syne+Mono&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:#f5f2ed; --surface:#fff; --surface2:#f0ede8; --border:#e0dbd3;
+      --text:#1a1814; --muted:#8a847a; --accent:#1a1814; --lime:#c8f53a;
+      --green:#16a34a; --red:#dc2626; --orange:#d97706;
+      --tt:#010101; --ig:#E1306C; --yt:#FF0000;
+    }
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;font-weight:300;min-height:100vh;}
+
+    nav{display:flex;align-items:center;justify-content:space-between;padding:20px 48px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
+    .nav-logo{font-family:'Playfair Display',serif;font-size:22px;}
+    .nav-links{display:flex;gap:28px;align-items:center;}
+    .nav-links a{color:var(--muted);font-size:13px;text-decoration:none;text-transform:uppercase;letter-spacing:0.08em;transition:color 0.2s;}
+    .nav-links a:hover{color:var(--text);}
+    .nav-cta{background:var(--accent);color:#fff!important;padding:10px 20px;border-radius:4px;}
+
+    /* HERO */
+    .hero{display:grid;grid-template-columns:1fr 1fr;min-height:80vh;}
+    .hero-left{padding:80px 64px;display:flex;flex-direction:column;justify-content:center;background:var(--surface);border-right:1px solid var(--border);}
+    .hero-eyebrow{font-family:'Syne Mono',monospace;font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:28px;display:flex;align-items:center;gap:10px;}
+    .hero-eyebrow::before{content:'';width:32px;height:1px;background:var(--muted);}
+    h1{font-family:'Playfair Display',serif;font-size:clamp(44px,5vw,72px);line-height:1.05;letter-spacing:-0.02em;margin-bottom:24px;}
+    h1 em{font-style:italic;color:var(--muted);}
+    .hero-sub{font-size:15px;color:var(--muted);line-height:1.75;max-width:400px;margin-bottom:44px;}
+    .hero-actions{display:flex;gap:14px;flex-wrap:wrap;}
+    .btn-dark{display:inline-flex;align-items:center;gap:10px;background:var(--accent);color:#fff;border:none;border-radius:4px;padding:13px 26px;font-size:13px;cursor:pointer;text-decoration:none;font-family:'Syne',sans-serif;letter-spacing:0.05em;text-transform:uppercase;transition:opacity 0.2s;}
+    .btn-dark:hover{opacity:0.85;}
+    .btn-outline{display:inline-flex;align-items:center;gap:8px;background:transparent;color:var(--text);border:1px solid var(--border);border-radius:4px;padding:12px 22px;font-size:13px;cursor:pointer;text-decoration:none;font-family:'Syne',sans-serif;letter-spacing:0.05em;text-transform:uppercase;transition:all 0.2s;}
+    .btn-outline:hover{border-color:var(--text);}
+    .hero-right{padding:80px 64px;display:flex;flex-direction:column;justify-content:center;background:var(--surface2);}
+    .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-bottom:32px;}
+    .stat-box{background:var(--surface);padding:24px;}
+    .stat-box:nth-child(odd){background:var(--accent);color:#fff;}
+    .stat-box:nth-child(odd) .stat-label{color:rgba(255,255,255,0.6);}
+    .stat-num{font-family:'Playfair Display',serif;font-size:36px;letter-spacing:-0.02em;margin-bottom:4px;}
+    .stat-label{font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);}
+    .platform-row{display:flex;gap:10px;flex-wrap:wrap;}
+    .platform-badge{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:100px;padding:8px 14px;font-size:12px;}
+
+    /* SECTIONS */
+    .section{padding:72px 48px;max-width:1200px;margin:0 auto;}
+    .section-eyebrow{font-family:'Syne Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;}
+    .section-title{font-family:'Playfair Display',serif;font-size:clamp(28px,3vw,40px);letter-spacing:-0.02em;margin-bottom:40px;line-height:1.1;}
+    .section-bg{background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+
+    /* APP SHELL */
+    .app-shell{border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.07);}
+    .app-titlebar{background:#2a2a2a;padding:11px 16px;display:flex;align-items:center;gap:8px;}
+    .dot{width:12px;height:12px;border-radius:50%;}
+    .dot-r{background:#ff5f57;}.dot-y{background:#febc2e;}.dot-g{background:#28c840;}
+    .titlebar-url{flex:1;text-align:center;font-family:'Syne Mono',monospace;font-size:11px;color:#888;}
+    .app-body{display:grid;grid-template-columns:200px 1fr;min-height:680px;}
+    .app-sidebar{background:#1a1a1a;padding:20px 0;border-right:1px solid #333;}
+    .sidebar-label{font-family:'Syne Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#555;padding:14px 18px 6px;}
+    .sidebar-item{display:flex;align-items:center;gap:10px;padding:9px 18px;font-size:12px;color:#888;cursor:pointer;transition:all 0.2s;}
+    .sidebar-item:hover,.sidebar-item.active{background:rgba(255,255,255,0.05);color:#fff;}
+    .sidebar-item.active{color:var(--lime);border-left:2px solid var(--lime);}
+    .app-main{background:var(--bg);padding:28px;overflow:auto;}
+
+    /* INSIGHTS DASHBOARD */
+    .insights-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px;}
+    .insights-header h3{font-family:'Playfair Display',serif;font-size:20px;letter-spacing:-0.01em;}
+    .platform-tabs{display:flex;gap:6px;}
+    .ptab{padding:6px 14px;border-radius:100px;font-size:11px;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--muted);font-family:'Syne',sans-serif;letter-spacing:0.05em;text-transform:uppercase;transition:all 0.2s;}
+    .ptab.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+    .ptab.tt.active{background:var(--tt);border-color:var(--tt);}
+    .ptab.ig.active{background:var(--ig);border-color:var(--ig);}
+    .ptab.yt.active{background:var(--yt);border-color:var(--yt);}
+
+    /* SUMMARY STAT CARDS */
+    .summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;}
+    .summary-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px 20px;}
+    .summary-card .s-label{font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:6px;}
+    .summary-card .s-num{font-family:'Playfair Display',serif;font-size:28px;letter-spacing:-0.02em;margin-bottom:2px;}
+    .summary-card .s-change{font-size:11px;color:var(--green);}
+    .summary-card .s-change.down{color:var(--red);}
+
+    /* CHART AREA */
+    .chart-area{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:20px;margin-bottom:20px;}
+    .chart-title{font-size:12px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:16px;}
+    .bar-chart{display:flex;align-items:flex-end;gap:8px;height:120px;}
+    .bar-col{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;}
+    .bar{border-radius:3px 3px 0 0;width:100%;transition:opacity 0.2s;cursor:pointer;}
+    .bar:hover{opacity:0.8;}
+    .bar-label{font-size:9px;color:var(--muted);font-family:'Syne Mono',monospace;text-align:center;}
+
+    /* POST TABLE */
+    .posts-table{background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+    .posts-table-header{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 80px;gap:0;padding:10px 16px;border-bottom:1px solid var(--border);font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);}
+    .post-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 80px;gap:0;padding:12px 16px;border-bottom:1px solid var(--border);align-items:center;transition:background 0.15s;}
+    .post-row:last-child{border-bottom:none;}
+    .post-row:hover{background:var(--surface2);}
+    .post-caption{font-size:12px;font-weight:400;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:280px;}
+    .post-date{font-size:10px;color:var(--muted);font-family:'Syne Mono',monospace;}
+    .post-stat{font-size:13px;font-weight:500;}
+    .post-score{display:inline-block;padding:3px 10px;border-radius:100px;font-size:11px;font-family:'Syne Mono',monospace;}
+    .score-high{background:rgba(22,163,74,0.12);color:var(--green);}
+    .score-mid{background:rgba(217,119,6,0.12);color:var(--orange);}
+    .score-low{background:rgba(220,38,38,0.12);color:var(--red);}
+
+    /* CONNECT SECTION */
+    .connect-section{padding:72px 48px;background:var(--surface2);border-top:1px solid var(--border);}
+    .connect-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start;}
+    .connect-text h2{font-family:'Playfair Display',serif;font-size:clamp(28px,3.5vw,40px);letter-spacing:-0.02em;margin-bottom:16px;line-height:1.1;}
+    .connect-text>p{color:var(--muted);font-size:15px;line-height:1.75;margin-bottom:28px;}
+    .perm-list{list-style:none;margin-bottom:28px;}
+    .perm-list li{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--border);}
+    .perm-icon{width:34px;height:34px;background:var(--surface);border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+    .perm-text strong{display:block;font-size:13px;font-weight:500;margin-bottom:2px;}
+    .perm-text span{font-size:12px;color:var(--muted);line-height:1.5;}
+    .connect-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:40px 36px;text-align:center;position:sticky;top:100px;box-shadow:0 8px 32px rgba(0,0,0,0.06);}
+    .card-icon{width:60px;height:60px;background:#080808;border-radius:16px;margin:0 auto 18px;display:flex;align-items:center;justify-content:center;}
+    .card-icon svg{width:32px;height:32px;}
+    .connect-card h3{font-family:'Playfair Display',serif;font-size:20px;margin-bottom:8px;}
+    .connect-card p{color:var(--muted);font-size:13px;margin-bottom:24px;line-height:1.6;}
+    .platform-connect-row{border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:10px;}
+    .platform-connect-label{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;margin-bottom:10px;}
+    .tiktok-btn{display:flex;align-items:center;justify-content:center;gap:10px;background:#1a1a1a;color:#fff;border:none;border-radius:8px;padding:12px 22px;font-size:13px;font-weight:500;cursor:pointer;width:100%;font-family:'Syne',sans-serif;transition:all 0.2s;text-decoration:none;}
+    .tiktok-btn:hover{background:#333;transform:translateY(-1px);}
+    .connected-btn{display:flex;align-items:center;justify-content:center;gap:10px;background:rgba(22,163,74,0.1);color:var(--green);border:1px solid rgba(22,163,74,0.3);border-radius:8px;padding:12px 22px;font-size:13px;font-weight:500;width:100%;font-family:'Syne',sans-serif;cursor:default;}
+    .connect-fine{font-size:11px;color:var(--muted);margin-top:14px;line-height:1.6;}
+    .connect-success{display:none;margin-top:14px;padding:11px 14px;background:rgba(22,163,74,0.08);border:1px solid rgba(22,163,74,0.2);border-radius:7px;font-size:13px;color:var(--green);}
+    .connect-success.visible{display:block;}
+
+    footer{border-top:1px solid var(--border);padding:28px 48px;display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:12px;background:var(--surface);}
+    footer a{color:var(--muted);text-decoration:none;transition:color 0.2s;}
+    footer a:hover{color:var(--text);}
+
+    @media(max-width:900px){
+      nav{padding:16px 24px;}
+      .hero{grid-template-columns:1fr;}
+      .hero-right{display:none;}
+      .section{padding:48px 24px;}
+      .app-body{grid-template-columns:1fr;}
+      .app-sidebar{display:none;}
+      .summary-grid{grid-template-columns:1fr 1fr;}
+      .connect-inner{grid-template-columns:1fr;gap:40px;}
+      .connect-card{position:static;}
+      .connect-section{padding:48px 24px;}
+      footer{padding:24px;flex-direction:column;gap:12px;}
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">Daphnie Insights</div>
+  <div class="nav-links">
+    <a href="#dashboard">Dashboard</a>
+    <a href="privacy-policy.html">Privacy</a>
+    <a href="terms-of-service.html">Terms</a>
+    <a href="#connect" class="nav-cta">Connect Accounts</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-left">
+    <div class="hero-eyebrow">Music Analytics Platform</div>
+    <h1>Know what<br><em>actually works.</em></h1>
+    <p class="hero-sub">Daphnie Insights tracks your music video performance across TikTok, Instagram Reels, and YouTube Shorts — so you can see which songs, clips, and captions connect with your audience.</p>
+    <div class="hero-actions">
+      <a href="#connect" class="btn-dark">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.31 6.31 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.75a4.85 4.85 0 01-1.01-.06z"/></svg>
+        Connect Your Accounts
+      </a>
+      <a href="#dashboard" class="btn-outline">See your dashboard</a>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="stat-grid">
+      <div class="stat-box"><div class="stat-num">3</div><div class="stat-label">Platforms tracked</div></div>
+      <div class="stat-box"><div class="stat-num">∞</div><div class="stat-label">Posts analysed</div></div>
+      <div class="stat-box"><div class="stat-num">100%</div><div class="stat-label">Your data</div></div>
+      <div class="stat-box"><div class="stat-num">0</div><div class="stat-label">Guesswork</div></div>
+    </div>
+    <p style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px;">Tracks performance on</p>
+    <div class="platform-row">
+      <div class="platform-badge">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.31 6.31 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.75a4.85 4.85 0 01-1.01-.06z"/></svg>
+        TikTok
+      </div>
+      <div class="platform-badge">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="#E1306C"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+        Instagram
+      </div>
+      <div class="platform-badge">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="#FF0000"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+        YouTube
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="section-bg" id="dashboard">
+  <div class="section">
+    <div class="section-eyebrow">Performance Dashboard</div>
+    <h2 class="section-title">Your insights at a glance</h2>
+
+    <div class="app-shell">
+      <div class="app-titlebar">
+        <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+        <div class="titlebar-url">daphnieinsights.github.io/dashboard</div>
+      </div>
+      <div class="app-body">
+        <div class="app-sidebar">
+          <div class="sidebar-label">Analytics</div>
+          <div class="sidebar-item active">📊 Overview</div>
+          <div class="sidebar-item">🎵 By Song</div>
+          <div class="sidebar-item">📅 By Date</div>
+          <div class="sidebar-label">Platforms</div>
+          <div class="sidebar-item">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.31 6.31 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.75a4.85 4.85 0 01-1.01-.06z"/></svg>
+            TikTok
+          </div>
+          <div class="sidebar-item">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="#E1306C"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+            Instagram
+          </div>
+          <div class="sidebar-item">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="#FF0000"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+            YouTube
+          </div>
+          <div class="sidebar-label">Account</div>
+          <div class="sidebar-item">🔐 Connected Accounts</div>
+        </div>
+        <div class="app-main">
+
+          <div class="insights-header">
+            <div>
+              <h3>Overview — June 2026</h3>
+              <p style="font-size:11px;color:var(--muted);margin-top:2px;">28 posts across 3 platforms</p>
+            </div>
+            <div class="platform-tabs">
+              <button class="ptab active" onclick="setTab(this,'all')">All</button>
+              <button class="ptab tt" onclick="setTab(this,'tt')">TikTok</button>
+              <button class="ptab ig" onclick="setTab(this,'ig')">Instagram</button>
+              <button class="ptab yt" onclick="setTab(this,'yt')">YouTube</button>
+            </div>
+          </div>
+
+          <!-- Summary stats -->
+          <div class="summary-grid">
+            <div class="summary-card">
+              <div class="s-label">Total Views</div>
+              <div class="s-num" id="stat-views">48.3k</div>
+              <div class="s-change">↑ 12% vs last month</div>
+            </div>
+            <div class="summary-card">
+              <div class="s-label">Avg Engagement</div>
+              <div class="s-num" id="stat-eng">3.4%</div>
+              <div class="s-change">↑ 0.8% vs last month</div>
+            </div>
+            <div class="summary-card">
+              <div class="s-label">Best Score</div>
+              <div class="s-num" id="stat-score">87</div>
+              <div class="s-change">Cupid — 14 Jun</div>
+            </div>
+            <div class="summary-card">
+              <div class="s-label">Avg Score</div>
+              <div class="s-num" id="stat-avg">41</div>
+              <div class="s-change down">↓ 3 vs last month</div>
+            </div>
+          </div>
+
+          <!-- Bar chart -->
+          <div class="chart-area">
+            <div class="chart-title">Views by post — last 14 posts</div>
+            <div class="bar-chart" id="bar-chart">
+              <!-- Bars injected by JS -->
+            </div>
+          </div>
+
+          <!-- Post table -->
+          <div class="posts-table">
+            <div class="posts-table-header">
+              <div>Post</div>
+              <div>Views</div>
+              <div>Likes</div>
+              <div>Comments</div>
+              <div>Score</div>
+            </div>
+            <div id="post-rows"><!-- Rows injected by JS --></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CONNECT -->
+<section class="connect-section" id="connect">
+  <div class="connect-inner">
+    <div class="connect-text">
+      <div class="section-eyebrow">Account Setup</div>
+      <h2>Connect your accounts</h2>
+      <p>Connect TikTok and Instagram to start tracking your music video performance across all platforms in one place.</p>
+      <ul class="perm-list">
+        <li>
+          <div class="perm-icon">📊</div>
+          <div class="perm-text"><strong>Read your video performance</strong><span>Fetches views, likes, comments, shares and engagement data for your posted videos.</span></div>
+        </li>
+        <li>
+          <div class="perm-icon">🔒</div>
+          <div class="perm-text"><strong>Verify your identity</strong><span>Confirms which account you're connecting. No personal messages, follower lists, or private data is accessed.</span></div>
+        </li>
+        <li>
+          <div class="perm-icon">🚫</div>
+          <div class="perm-text"><strong>What we don't access</strong><span>We never read your inbox, contacts, or anything beyond the video stats needed to generate your report.</span></div>
+        </li>
+      </ul>
+      <p style="font-size:12px;color:var(--muted);">Disconnect at any time: TikTok → Settings → Security → Authorised Apps. Instagram → Settings → Apps and Websites.</p>
+    </div>
+    <div class="connect-card">
+      <div class="card-icon">
+        <svg viewBox="0 0 24 24" fill="#c8ff00"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.31 6.31 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.75a4.85 4.85 0 01-1.01-.06z"/></svg>
+      </div>
+      <h3>Daphnie Insights</h3>
+      <p>Connect your accounts to start seeing what content performs best for your music.</p>
+
+      <!-- TikTok -->
+      <div class="platform-connect-row">
+        <div class="platform-connect-label">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.31 6.31 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.75a4.85 4.85 0 01-1.01-.06z"/></svg>
+          TikTok
+        </div>
+        <a class="tiktok-btn" href="#" id="tiktokLoginBtn" onclick="doLogin(event)">
+          <svg viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px;"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.31 6.31 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.75a4.85 4.85 0 01-1.01-.06z"/></svg>
+          Connect with TikTok
+        </a>
+      </div>
+
+      <!-- Instagram -->
+      <div class="platform-connect-row">
+        <div class="platform-connect-label">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="#E1306C"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+          Instagram
+        </div>
+        <div class="connected-btn">✓ Instagram Connected</div>
+      </div>
+
+      <!-- YouTube -->
+      <div class="platform-connect-row">
+        <div class="platform-connect-label">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="#FF0000"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+          YouTube
+        </div>
+        <div class="connected-btn">✓ YouTube Connected</div>
+      </div>
+
+      <p class="connect-fine">By connecting, you authorise Daphnie Insights to read video performance data from your accounts. Disconnect at any time from each platform's settings.</p>
+      <div class="connect-success" id="connectSuccess">✓ TikTok connected successfully!</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div>© 2026 Daphnie Insights</div>
+  <div style="display:flex;gap:20px;">
+    <a href="privacy-policy.html">Privacy Policy</a>
+    <a href="terms-of-service.html">Terms of Service</a>
+  </div>
+</footer>
+
+<script>
+  const CLIENT_KEY = 'aw2r9f2oaloc9vpu';
+  const REDIRECT   = 'https://daphnieinsights.github.io/';
+
+  // Demo data per platform
+  const data = {
+    all: {
+      views:'48.3k', eng:'3.4%', score:'87', avg:'41',
+      bars:[820,1240,680,2100,950,3400,1100,880,1560,720,4200,1800,2300,960],
+      posts:[
+        {caption:'For when your writers are on strike. 28 by Daphnie',date:'22 Jun',views:'4,200',likes:'312',comments:'28',score:87,scoreClass:'score-high'},
+        {caption:'Soundtrack your next chapter. Cupid by Daphnie',date:'19 Jun',views:'3,400',likes:'241',comments:'19',score:74,scoreClass:'score-high'},
+        {caption:'Man\'s crashing out. 28 by Daphnie',date:'17 Jun',views:'2,300',likes:'187',comments:'14',score:61,scoreClass:'score-mid'},
+        {caption:'For dancing in your bedroom. Cupid by Daphnie',date:'14 Jun',views:'1,800',likes:'143',comments:'11',score:55,scoreClass:'score-mid'},
+        {caption:'Do something different. 28 by Daphnie',date:'11 Jun',views:'1,560',likes:'98',comments:'8',score:44,scoreClass:'score-mid'},
+        {caption:'For if you need to revamp your aura. Alive by Daphnie',date:'8 Jun',views:'1,240',likes:'76',comments:'5',score:32,scoreClass:'score-low'},
+        {caption:'Goofed up burnout anthem. Alive by Daphnie',date:'5 Jun',views:'820',likes:'44',comments:'3',score:18,scoreClass:'score-low'},
+      ]
+    },
+    tt: {
+      views:'22.1k', eng:'4.2%', score:'91', avg:'48',
+      bars:[410,620,340,1050,475,1700,550,440,780,360,2100,900,1150,480],
+      posts:[
+        {caption:'For when your writers are on strike. 28 by Daphnie',date:'22 Jun',views:'2,100',likes:'198',comments:'22',score:91,scoreClass:'score-high'},
+        {caption:'Soundtrack your next chapter. Cupid by Daphnie',date:'19 Jun',views:'1,700',likes:'154',comments:'15',score:78,scoreClass:'score-high'},
+        {caption:'Man\'s crashing out. 28 by Daphnie',date:'17 Jun',views:'1,150',likes:'112',comments:'10',score:63,scoreClass:'score-mid'},
+        {caption:'For dancing in your bedroom. Cupid by Daphnie',date:'14 Jun',views:'900',likes:'87',comments:'7',score:52,scoreClass:'score-mid'},
+        {caption:'Do something different. 28 by Daphnie',date:'11 Jun',views:'780',likes:'61',comments:'5',score:41,scoreClass:'score-mid'},
+        {caption:'For if you need to revamp your aura. Alive by Daphnie',date:'8 Jun',views:'620',likes:'43',comments:'3',score:28,scoreClass:'score-low'},
+        {caption:'Goofed up burnout anthem. Alive by Daphnie',date:'5 Jun',views:'410',likes:'24',comments:'2',score:14,scoreClass:'score-low'},
+      ]
+    },
+    ig: {
+      views:'14.8k', eng:'2.8%', score:'79', avg:'36',
+      bars:[248,372,204,630,285,1020,330,264,468,216,1260,540,690,288],
+      posts:[
+        {caption:'For when your writers are on strike. 28 by Daphnie',date:'22 Jun',views:'1,260',likes:'82',comments:'4',score:79,scoreClass:'score-high'},
+        {caption:'Soundtrack your next chapter. Cupid by Daphnie',date:'19 Jun',views:'1,020',likes:'64',comments:'3',score:66,scoreClass:'score-mid'},
+        {caption:'Man\'s crashing out. 28 by Daphnie',date:'17 Jun',views:'690',likes:'48',comments:'3',score:51,scoreClass:'score-mid'},
+        {caption:'For dancing in your bedroom. Cupid by Daphnie',date:'14 Jun',views:'540',likes:'38',comments:'2',score:42,scoreClass:'score-mid'},
+        {caption:'Do something different. 28 by Daphnie',date:'11 Jun',views:'468',likes:'24',comments:'2',score:33,scoreClass:'score-low'},
+        {caption:'For if you need to revamp your aura. Alive by Daphnie',date:'8 Jun',views:'372',likes:'18',comments:'1',score:22,scoreClass:'score-low'},
+        {caption:'Goofed up burnout anthem. Alive by Daphnie',date:'5 Jun',views:'248',likes:'11',comments:'1',score:11,scoreClass:'score-low'},
+      ]
+    },
+    yt: {
+      views:'11.4k', eng:'2.9%', score:'83', avg:'38',
+      bars:[162,248,136,420,190,680,220,176,312,144,840,360,460,192],
+      posts:[
+        {caption:'For when your writers are on strike. 28 by Daphnie',date:'22 Jun',views:'840',likes:'32',comments:'2',score:83,scoreClass:'score-high'},
+        {caption:'Soundtrack your next chapter. Cupid by Daphnie',date:'19 Jun',views:'680',likes:'23',comments:'1',score:68,scoreClass:'score-mid'},
+        {caption:'Man\'s crashing out. 28 by Daphnie',date:'17 Jun',views:'460',likes:'17',comments:'1',score:53,scoreClass:'score-mid'},
+        {caption:'For dancing in your bedroom. Cupid by Daphnie',date:'14 Jun',views:'360',likes:'18',comments:'2',score:47,scoreClass:'score-mid'},
+        {caption:'Do something different. 28 by Daphnie',date:'11 Jun',views:'312',likes:'13',comments:'1',score:37,scoreClass:'score-low'},
+        {caption:'For if you need to revamp your aura. Alive by Daphnie',date:'8 Jun',views:'248',likes:'15',comments:'1',score:27,scoreClass:'score-low'},
+        {caption:'Goofed up burnout anthem. Alive by Daphnie',date:'5 Jun',views:'162',likes:'9',comments:'0',score:14,scoreClass:'score-low'},
+      ]
+    }
+  };
+
+  let currentTab = 'all';
+
+  function setTab(btn, tab) {
+    document.querySelectorAll('.ptab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentTab = tab;
+    renderDashboard(tab);
+  }
+
+  function renderDashboard(tab) {
+    const d = data[tab];
+    document.getElementById('stat-views').textContent = d.views;
+    document.getElementById('stat-eng').textContent = d.eng;
+    document.getElementById('stat-score').textContent = d.score;
+    document.getElementById('stat-avg').textContent = d.avg;
+    renderBars(d.bars, tab);
+    renderPosts(d.posts);
+  }
+
+  function renderBars(bars, tab) {
+    const colors = {all:'#1a1814', tt:'#010101', ig:'#E1306C', yt:'#FF0000'};
+    const col = colors[tab] || '#1a1814';
+    const max = Math.max(...bars);
+    const dates = ['5 Jun','6 Jun','7 Jun','8 Jun','9 Jun','10 Jun','11 Jun','12 Jun','13 Jun','14 Jun','17 Jun','19 Jun','21 Jun','22 Jun'];
+    const chart = document.getElementById('bar-chart');
+    chart.innerHTML = bars.map((v,i) => `
+      <div class="bar-col">
+        <div class="bar" style="height:${Math.round(v/max*100)}px;background:${col};opacity:${0.4 + (v/max)*0.6}" title="${v.toLocaleString()} views"></div>
+        <div class="bar-label">${dates[i] || ''}</div>
+      </div>
+    `).join('');
+  }
+
+  function renderPosts(posts) {
+    const rows = document.getElementById('post-rows');
+    rows.innerHTML = posts.map(p => `
+      <div class="post-row">
+        <div>
+          <div class="post-caption">${p.caption}</div>
+          <div class="post-date">${p.date}</div>
+        </div>
+        <div class="post-stat">${p.views}</div>
+        <div class="post-stat">${p.likes}</div>
+        <div class="post-stat">${p.comments}</div>
+        <div><span class="post-score ${p.scoreClass}">${p.score}</span></div>
+      </div>
+    `).join('');
+  }
+
+  // Initial render
+  renderDashboard('all');
+
+  // TikTok OAuth
+  function doLogin(e) {
+    e.preventDefault();
+    window.location.href =
+      'https://www.tiktok.com/v2/auth/authorize/?client_key=' + CLIENT_KEY +
+      '&scope=video.list,user.info.basic&response_type=code' +
+      '&redirect_uri=' + encodeURIComponent(REDIRECT);
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('code')) {
+    document.getElementById('connectSuccess').classList.add('visible');
+    const btn = document.getElementById('tiktokLoginBtn');
+    btn.innerHTML = '✓ &nbsp;TikTok Connected';
+    btn.style.background = '#16a34a';
+    btn.onclick = null;
+    window.history.replaceState({}, document.title, window.location.pathname);
+    setTimeout(() => document.getElementById('connect').scrollIntoView({behavior:'smooth'}), 300);
+  }
+</script>
+</body>
+</html>
