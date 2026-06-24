@@ -474,19 +474,19 @@ function buildRows() {
     const col = scoreColour(p.overall, allOverall);
 
     const ytCell = yt ? `<td>
-      <a href="${yt.url}" target="_blank" class="post-link">youtube.com/shorts ↗</a>
+      <a href="${yt.url}" target="_blank" class="post-link">view ↗</a>
       <div class="mini-stats"><span>👁 ${yt.views.toLocaleString()}</span><span>♥ ${yt.likes}</span><span>💬 ${yt.comments}</span></div>
       <div class="score-wrap"><span class="plat-score" style="color:${scoreColour(ytScore,allYt)}">${ytScore}/100</span><div class="bar-bg"><div class="bar" style="width:${ytScore}%;background:${scoreColour(ytScore,allYt)}"></div></div></div>
     </td>` : '<td class="na">—</td>';
 
     const igCell = ig ? `<td>
-      <a href="${ig.url}" target="_blank" class="post-link">instagram.com/reel ↗</a>
+      <a href="${ig.url}" target="_blank" class="post-link">view ↗</a>
       <div class="mini-stats"><span>▶ ${ig.views.toLocaleString()}</span><span>♥ ${ig.likes}</span><span>🔖 ${ig.saves}</span></div>
       <div class="score-wrap"><span class="plat-score" style="color:${scoreColour(igScore,allIg)}">${igScore}/100</span><div class="bar-bg"><div class="bar" style="width:${igScore}%;background:${scoreColour(igScore,allIg)}"></div></div></div>
     </td>` : '<td class="na">—</td>';
 
     const ttCell = tt ? `<td>
-      <a href="${tt.url}" target="_blank" class="post-link">tiktok.com ↗</a>
+      <a href="${tt.url}" target="_blank" class="post-link">view ↗</a>
       <div class="mini-stats"><span>👁 ${tt.views.toLocaleString()}</span><span>♥ ${tt.likes}</span><span>💬 ${tt.comments}</span></div>
       <div class="score-wrap"><span class="plat-score" style="color:${scoreColour(ttScore,allTt)}">${ttScore}/100</span><div class="bar-bg"><div class="bar" style="width:${ttScore}%;background:${scoreColour(ttScore,allTt)}"></div></div></div>
     </td>` : '<td class="na">—</td>';
