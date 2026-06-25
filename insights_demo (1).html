@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daphnie Insights</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23080808'/><ellipse cx='38' cy='62' rx='10' ry='7' transform='rotate(-25 38 62)' fill='%23c8ff00'/><ellipse cx='62' cy='54' rx='10' ry='7' transform='rotate(-25 62 54)' fill='%23c8ff00'/><line x1='47' y1='58' x2='47' y2='35' stroke='%23c8ff00' stroke-width='3.5'/><line x1='71' y1='50' x2='71' y2='27' stroke='%23c8ff00' stroke-width='3.5'/><line x1='47' y1='35' x2='71' y2='27' stroke='%23c8ff00' stroke-width='4'/></svg>">
+<style>
+  :root {
+    --bg:#0a0a0a; --surface:#111; --surface2:#181818;
+    --border:#222; --text:#f0ede8; --muted:#555;
+    --green:#00e676; --yellow:#ffeb3b; --red:#ff5252;
+    --accent:#c8ff00;
+    --tt:#69C9D0; --ig:#E1306C; --yt:#ff4444;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;line-height:1.5;}
+
+  /* ── NAV ── */
+  nav{display:flex;align-items:center;justify-content:space-between;padding:18px 48px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
+  .nav-logo{display:flex;align-items:center;gap:10px;font-size:18px;font-weight:300;letter-spacing:-0.01em;}
+  .nav-logo svg{width:28px;height:28px;}
+  .nav-links{display:flex;gap:24px;align-items:center;}
+  .nav-links a{color:var(--muted);font-size:12px;text-decoration:none;text-transform:uppercase;letter-spacing:0.08em;transition:color 0.2s;}
+  .nav-links a:hover{color:var(--text);}
+  .nav-cta{background:var(--accent);color:#000!important;padding:8px 18px;border-radius:4px;font-weight:500;}
+
+  /* ── CONNECT HERO ── */
+  .connect-hero{padding:64px 48px;border-bottom:1px solid var(--border);display:grid;grid-template-columns:1fr 420px;gap:80px;align-items:center;max-width:1200px;margin:0 auto;}
+  .connect-hero h1{font-size:clamp(36px,4vw,56px);font-weight:300;letter-spacing:-0.03em;line-height:1.05;margin-bottom:16px;}
+  .connect-hero h1 span{color:var(--accent);}
+  .connect-hero p{color:var(--muted);font-size:15px;line-height:1.75;max-width:480px;margin-bottom:32px;}
+  .perm-list{list-style:none;margin-bottom:0;}
+  .perm-list li{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);font-size:13px;}
+  .perm-list li:last-child{border-bottom:none;}
+  .perm-icon{width:28px;height:28px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;margin-top:1px;}
+  .perm-text strong{display:block;color:var(--text);margin-bottom:2px;}
+  .perm-text span{color:var(--muted);font-size:12px;}
+
+  /* ── CONNECT CARD ── */
+  .connect-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:32px;position:sticky;top:80px;}
+  .connect-card-header{display:flex;align-items:center;gap:12px;margin-bottom:24px;}
+  .logo-mark{width:44px;height:44px;background:#0a0a0a;border:1px solid var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;}
+  .connect-card-header h3{font-size:16px;font-weight:400;letter-spacing:-0.01em;}
+  .connect-card-header p{font-size:11px;color:var(--muted);margin-top:1px;}
+  .platform-row{border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:10px;}
+  .platform-label{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:500;margin-bottom:10px;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);}
+  .tiktok-btn{display:flex;align-items:center;justify-content:center;gap:8px;background:#fff;color:#000;border:none;border-radius:6px;padding:11px 16px;font-size:13px;font-weight:600;cursor:pointer;width:100%;font-family:inherit;transition:opacity 0.2s;text-decoration:none;}
+  .tiktok-btn:hover{opacity:0.9;}
+  .connected-row{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:rgba(0,230,118,0.06);border:1px solid rgba(0,230,118,0.2);border-radius:6px;font-size:12px;}
+  .connected-row .check{color:var(--green);font-weight:600;}
+  .connected-row .platform-name{display:flex;align-items:center;gap:6px;}
+  .connect-fine{font-size:11px;color:var(--muted);margin-top:14px;line-height:1.6;text-align:center;}
+  .connect-success{display:none;margin-top:10px;padding:10px;background:rgba(0,230,118,0.08);border:1px solid rgba(0,230,118,0.2);border-radius:6px;font-size:12px;color:var(--green);text-align:center;}
+  .connect-success.visible{display:block;}
+
+  /* ── INSIGHTS MAIN ── */
+  .insights-wrap{max-width:1200px;margin:0 auto;}
+  header{padding:40px 48px 32px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:16px;}
+  header h1{font-size:32px;font-weight:300;letter-spacing:-0.02em;}
+  header h1 span{color:var(--accent);}
+  .generated{color:var(--muted);font-size:12px;}
+
+  section{padding:40px 48px;}
+  section+section{border-top:1px solid var(--border);}
+  h2{font-size:13px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:24px;}
+
+  /* ── CARDS ── */
+  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+  .card-top{border-color:#00e67640;background:linear-gradient(135deg,#00e67608,transparent);}
+  .card-bottom{border-color:#ff525240;background:linear-gradient(135deg,#ff525208,transparent);}
+  .card-header{display:flex;justify-content:space-between;align-items:flex-start;padding:16px 20px 12px;border-bottom:1px solid var(--border);}
+  .rank-label{font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);}
+  .overall-score{font-size:22px;font-weight:600;}
+  .score-sublabel{font-size:10px;color:var(--muted);margin-top:2px;text-align:right;}
+  .card-body{padding:16px 20px;}
+  .caption{font-size:13px;color:var(--text);margin-bottom:10px;font-style:italic;}
+  .meta{font-size:11px;color:var(--muted);margin-bottom:14px;}
+  .plat-links{display:flex;gap:8px;flex-wrap:wrap;}
+  .plat-link{font-size:11px;padding:4px 10px;border-radius:100px;text-decoration:none;border:1px solid var(--border);color:var(--muted);transition:all 0.2s;}
+  .plat-link:hover{color:var(--text);border-color:var(--text);}
+  .plat-link.youtube{border-color:#ff000040;color:var(--yt);}
+  .plat-link.instagram{border-color:#E1306C40;color:var(--ig);}
+  .plat-link.tiktok{border-color:#69C9D040;color:var(--tt);}
+
+  /* ── TABLE ── */
+  table{width:100%;border-collapse:collapse;}
+  th{text-align:left;padding:12px 16px;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);}
+  td{padding:14px 16px;border-bottom:1px solid var(--border);vertical-align:middle;}
+  tr:last-child td{border-bottom:none;}
+  tr[data-overall]:hover td{background:var(--surface);}
+  .na{color:var(--muted);text-align:center;font-size:12px;}
+  .caption-cell{font-size:13px;margin-bottom:3px;}
+  .song-cell{font-size:11px;color:var(--accent);}
+  .date-cell{font-size:11px;color:var(--muted);}
+  .post-link{color:var(--accent);text-decoration:none;font-size:11px;display:inline-block;margin-bottom:6px;}
+  .post-link:hover{text-decoration:underline;}
+  .mini-stats{display:flex;gap:8px;flex-wrap:wrap;font-size:11px;color:var(--muted);margin-bottom:6px;}
+  .score-wrap{display:flex;align-items:center;gap:8px;}
+  .bar-bg{flex:1;height:4px;background:var(--border);border-radius:2px;overflow:hidden;}
+  .bar{height:100%;border-radius:2px;}
+  .plat-score{font-weight:600;}
+  .overall-badge{display:inline-block;padding:4px 10px;border-radius:100px;font-size:12px;font-weight:600;}
+  .thumb-img{width:80px;height:45px;object-fit:cover;border-radius:4px;background:#111;}
+  .thumb-ph{width:80px;height:45px;border-radius:4px;background:var(--surface2);flex-shrink:0;}
+
+  /* ── FILTERS / SORT ── */
+  .platform-filters{display:flex;gap:8px;flex-wrap:wrap;}
+  .filter-btn{background:transparent;border:1px solid var(--border);color:var(--muted);padding:6px 14px;border-radius:100px;font-size:11px;letter-spacing:0.06em;cursor:pointer;transition:all 0.2s;font-family:inherit;}
+  .filter-btn:hover{color:var(--text);border-color:var(--text);}
+  .filter-btn.active{background:var(--surface2);color:var(--text);border-color:var(--text);}
+  tr.hidden{display:none;}
+  .plat-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;}
+
+  /* ── SONG HEADER ROWS ── */
+  .song-header-row td{background:var(--surface2);padding:10px 14px;border-radius:4px;}
+
+  @media(max-width:900px){
+    nav{padding:14px 20px;}
+    .connect-hero{grid-template-columns:1fr;gap:40px;padding:40px 20px;}
+    header,section{padding:24px 20px;}
+    .cards{grid-template-columns:1fr;}
+    table{display:block;overflow-x:auto;}
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <rect width="100" height="100" rx="22" fill="#080808"/>
+      <ellipse cx="38" cy="62" rx="10" ry="7" transform="rotate(-25 38 62)" fill="#c8ff00"/>
+      <ellipse cx="62" cy="54" rx="10" ry="7" transform="rotate(-25 62 54)" fill="#c8ff00"/>
+      <line x1="47" y1="58" x2="47" y2="35" stroke="#c8ff00" stroke-width="3.5"/>
+      <line x1="71" y1="50" x2="71" y2="27" stroke="#c8ff00" stroke-width="3.5"/>
+      <line x1="47" y1="35" x2="71" y2="27" stroke="#c8ff00" stroke-width="4"/>
+    </svg>
+    Daphnie Insights
+  </div>
+  <div class="nav-links">
+    <a href="#dashboard">Dashboard</a>
+    <a href="privacy-policy.html">Privacy</a>
+    <a href="terms-of-service.html">Terms</a>
+    <a href="#connect" class="nav-cta">Connect TikTok</a>
+  </div>
+</nav>
+
+<!-- CONNECT SECTION -->
+<div style="border-bottom:1px solid var(--border);" id="connect">
+  <div class="connect-hero">
+    <div>
+      <h1>See what's working<span>.</span><br>Across every platform.</h1>
+      <p>Connect your TikTok account to unlock performance insights across TikTok, Instagram, and YouTube — all in one place. See which songs, clips, and captions actually drive engagement.</p>
+      <ul class="perm-list">
+        <li>
+          <div class="perm-icon">📊</div>
+          <div class="perm-text"><strong>Read your video performance</strong><span>Views, likes, comments and shares for every video you've posted through Daphnie Insights.</span></div>
+        </li>
+        <li>
+          <div class="perm-icon">🔒</div>
+          <div class="perm-text"><strong>Verify your identity</strong><span>Confirms which TikTok account you're connecting. No private messages or follower data is accessed.</span></div>
+        </li>
+        <li>
+          <div class="perm-icon">🚫</div>
+          <div class="perm-text"><strong>What we never access</strong><span>Your inbox, contacts, payment info, or anything beyond the video stats used to generate your report.</span></div>
+        </li>
+      </ul>
+    </div>
+    <div class="connect-card">
+      <div class="connect-card-header">
+        <div class="logo-mark">
+          <svg width="22" height="22" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="38" cy="62" rx="10" ry="7" transform="rotate(-25 38 62)" fill="#c8ff00"/>
+            <ellipse cx="62" cy="54" rx="10" ry="7" transform="rotate(-25 62 54)" fill="#c8ff00"/>
+            <line x1="47" y1="58" x2="47" y2="35" stroke="#c8ff00" stroke-width="3.5"/>
+            <line x1="71" y1="50" x2="71" y2="27" stroke="#c8ff00" stroke-width="3.5"/>
+            <line x1="47" y1="35" x2="71" y2="27" stroke="#c8ff00" stroke-width="4"/>
+          </svg>
+        </div>
+        <div>
+          <h3>Daphnie Insights</h3>
+          <p>Connect your accounts to get started</p>
+        </div>
+      </div>
+
+      <div class="platform-row">
+        <div class="platform-label">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.31 6.31 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.75a4.85 4.85 0 01-1.01-.06z"/></svg>
+          TikTok
+        </div>
+        <a class="tiktok-btn" href="#" id="tiktokBtn" onclick="doLogin(event)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.31 6.31 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.75a4.85 4.85 0 01-1.01-.06z"/></svg>
+          Connect with TikTok
+        </a>
+      </div>
+
+      <div class="platform-row">
+        <div class="platform-label">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#E1306C"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+          Instagram
+        </div>
+        <div class="connected-row">
+          <div class="platform-name">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="#E1306C"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+            @probablydaphnie
+          </div>
+          <span class="check">✓ Connected</span>
+        </div>
+      </div>
+
+      <div class="platform-row">
+        <div class="platform-label">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#FF0000"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+          YouTube
+        </div>
+        <div class="connected-row">
+          <div class="platform-name">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="#FF0000"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+            Daphnie
+          </div>
+          <span class="check">✓ Connected</span>
+        </div>
+      </div>
+
+      <div class="connect-success" id="connectSuccess">✓ TikTok connected — your dashboard is ready.</div>
+      <p class="connect-fine">By connecting, you authorise Daphnie Insights to read video stats from your accounts. Disconnect any time from each platform's settings.</p>
+    </div>
+  </div>
+</div>
+
+<!-- INSIGHTS DASHBOARD -->
+<div class="insights-wrap" id="dashboard">
+  <header>
+    <div>
+      <h1>Daphnie<span>.</span> Insights</h1>
+      <div style="color:var(--muted);font-size:13px;margin-top:4px">12 posts tracked across TikTok, YouTube &amp; Instagram</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:12px">
+      <div class="generated">Generated 24 Jun 2026</div>
+      <div class="platform-filters">
+        <button class="filter-btn active" onclick="filterPlatform(this,'all')">All</button>
+        <button class="filter-btn" onclick="filterPlatform(this,'youtube')" style="color:var(--yt);border-color:#ff000040">&#9654; YouTube</button>
+        <button class="filter-btn" onclick="filterPlatform(this,'instagram')" style="color:var(--ig);border-color:#E1306C40">&#9670; Instagram</button>
+        <button class="filter-btn" onclick="filterPlatform(this,'tiktok')" style="color:var(--tt);border-color:#69C9D040">&#9834; TikTok</button>
+      </div>
+    </div>
+  </header>
+
+  <section>
+    <h2>&#127942; Best Performing Posts</h2>
+    <div id="best-all" class="plat-cards">
+      <div class="card card-top">
+        <div class="card-header"><span class="rank-label">#1 Best</span><div style="text-align:right"><span class="overall-score" style="color:#00e676">87/100</span><div class="score-sublabel">Overall score</div></div></div>
+        <div class="card-body">
+          <div class="caption">"For when your writers are on strike. 28 by Daphnie"</div>
+          <div class="meta">🎵 28 &nbsp;·&nbsp; 📅 22 Jun 2026, 6:13PM &nbsp;·&nbsp; 🎬 28_Framed_V2.mp4</div>
+          <div class="plat-links"><a href="#" class="plat-link youtube">▶ YouTube</a><a href="#" class="plat-link instagram">◆ Instagram</a><a href="#" class="plat-link tiktok">♪ TikTok</a></div>
+        </div>
+      </div>
+      <div class="card card-top">
+        <div class="card-header"><span class="rank-label">#2 Best</span><div style="text-align:right"><span class="overall-score" style="color:#00e676">74/100</span><div class="score-sublabel">Overall score</div></div></div>
+        <div class="card-body">
+          <div class="caption">"Soundtrack your next chapter. Cupid by Daphnie"</div>
+          <div class="meta">🎵 Cupid &nbsp;·&nbsp; 📅 19 Jun 2026, 6:14PM &nbsp;·&nbsp; 🎬 Cupid_Door_Blue.mov</div>
+          <div class="plat-links"><a href="#" class="plat-link youtube">▶ YouTube</a><a href="#" class="plat-link instagram">◆ Instagram</a><a href="#" class="plat-link tiktok">♪ TikTok</a></div>
+        </div>
+      </div>
+      <div class="card card-top">
+        <div class="card-header"><span class="rank-label">#3 Best</span><div style="text-align:right"><span class="overall-score" style="color:#ffeb3b">61/100</span><div class="score-sublabel">Overall score</div></div></div>
+        <div class="card-body">
+          <div class="caption">"Man's crashing out. 28 by Daphnie #indierock"</div>
+          <div class="meta">🎵 28 &nbsp;·&nbsp; 📅 17 Jun 2026, 8:30PM &nbsp;·&nbsp; 🎬 28_Cross_Pre1.mp4</div>
+          <div class="plat-links"><a href="#" class="plat-link youtube">▶ YouTube</a><a href="#" class="plat-link instagram">◆ Instagram</a><a href="#" class="plat-link tiktok">♪ TikTok</a></div>
+        </div>
+      </div>
+    </div>
+    <div id="best-youtube" class="plat-cards" style="display:none">
+      <div class="card card-top">
+        <div class="card-header"><span class="rank-label">#1 Best</span><div style="text-align:right"><span class="overall-score" style="color:#00e676">83/100</span><div class="score-sublabel">YouTube score</div></div></div>
+        <div class="card-body">
+          <div class="caption">"For when your writers are on strike. 28 by Daphnie"</div>
+          <div class="meta">🎵 28 &nbsp;·&nbsp; 📅 22 Jun 2026 &nbsp;·&nbsp; 4,200 views · 312 likes</div>
+          <div class="plat-links"><a href="#" class="plat-link youtube">▶ YouTube</a></div>
+        </div>
+      </div>
+      <div class="card card-top">
+        <div class="card-header"><span class="rank-label">#2 Best</span><div style="text-align:right"><span class="overall-score" style="color:#00e676">68/100</span><div class="score-sublabel">YouTube score</div></div></div>
+        <div class="card-body">
+          <div class="caption">"Soundtrack your next chapter. Cupid by Daphnie"</div>
+          <div class="meta">🎵 Cupid &nbsp;·&nbsp; 📅 19 Jun 2026 &nbsp;·&nbsp; 3,400 views · 241 likes</div>
+          <div class="plat-links"><a href="#" class="plat-link youtube">▶ YouTube</a></div>
+        </div>
+      </div>
+    </div>
+    <div id="best-instagram" class="plat-cards" style="display:none">
+      <div class="card card-top">
+        <div class="card-header"><span class="rank-label">#1 Best</span><div style="text-align:right"><span class="overall-score" style="color:#00e676">79/100</span><div class="score-sublabel">Instagram score</div></div></div>
+        <div class="card-body">
+          <div class="caption">"For when your writers are on strike. 28 by Daphnie"</div>
+          <div class="meta">🎵 28 &nbsp;·&nbsp; 📅 22 Jun 2026 &nbsp;·&nbsp; 1,260 plays · 82 likes · 4 saves</div>
+          <div class="plat-links"><a href="#" class="plat-link instagram">◆ Instagram</a></div>
+        </div>
+      </div>
+      <div class="card card-top">
+        <div class="card-header"><span class="rank-label">#2 Best</span><div style="text-align:right"><span class="overall-score" style="color:#00e676">66/100</span><div class="score-sublabel">Instagram score</div></div></div>
+        <div class="card-body">
+          <div class="caption">"Soundtrack your next chapter. Cupid by Daphnie"</div>
+          <div class="meta">🎵 Cupid &nbsp;·&nbsp; 📅 19 Jun 2026 &nbsp;·&nbsp; 1,020 plays · 64 likes · 3 saves</div>
+          <div class="plat-links"><a href="#" class="plat-link instagram">◆ Instagram</a></div>
+        </div>
+      </div>
+    </div>
+    <div id="best-tiktok" class="plat-cards" style="display:none">
+      <div class="card card-top">
+        <div class="card-header"><span class="rank-label">#1 Best</span><div style="text-align:right"><span class="overall-score" style="color:#00e676">91/100</span><div class="score-sublabel">TikTok score</div></div></div>
+        <div class="card-body">
+          <div class="caption">"For when your writers are on strike. 28 by Daphnie"</div>
+          <div class="meta">🎵 28 &nbsp;·&nbsp; 📅 22 Jun 2026 &nbsp;·&nbsp; 2,100 views · 198 likes · 22 comments</div>
+          <div class="plat-links"><a href="#" class="plat-link tiktok">♪ TikTok</a></div>
+        </div>
+      </div>
+      <div class="card card-top">
+        <div class="card-header"><span class="rank-label">#2 Best</span><div style="text-align:right"><span class="overall-score" style="color:#00e676">78/100</span><div class="score-sublabel">TikTok score</div></div></div>
+        <div class="card-body">
+          <div class="caption">"Soundtrack your next chapter. Cupid by Daphnie"</div>
+          <div class="meta">🎵 Cupid &nbsp;·&nbsp; 📅 19 Jun 2026 &nbsp;·&nbsp; 1,700 views · 154 likes · 15 comments</div>
+          <div class="plat-links"><a href="#" class="plat-link tiktok">♪ TikTok</a></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>&#128201; Posts That Need Work</h2>
+    <div id="worst-all" class="plat-cards">
+      <div class="card card-bottom">
+        <div class="card-header"><span class="rank-label">#1 Needs Work</span><div style="text-align:right"><span class="overall-score" style="color:#ff5252">11/100</span><div class="score-sublabel">Overall score</div></div></div>
+        <div class="card-body">
+          <div class="caption">"Goofed up burnout anthem. Alive (not dead) by Daphnie"</div>
+          <div class="meta">🎵 Alive &nbsp;·&nbsp; 📅 5 Jun 2026, 9:30AM &nbsp;·&nbsp; 🎬 Alive_Walk_Night.mov</div>
+          <div class="plat-links"><a href="#" class="plat-link youtube">▶ YouTube</a><a href="#" class="plat-link instagram">◆ Instagram</a></div>
+        </div>
+      </div>
+      <div class="card card-bottom">
+        <div class="card-header"><span class="rank-label">#2 Needs Work</span><div style="text-align:right"><span class="overall-score" style="color:#ff5252">18/100</span><div class="score-sublabel">Overall score</div></div></div>
+        <div class="card-body">
+          <div class="caption">"For if you need to revamp your aura. Alive (not dead) by Daphnie"</div>
+          <div class="meta">🎵 Alive &nbsp;·&nbsp; 📅 8 Jun 2026, 6:12PM &nbsp;·&nbsp; 🎬 Alive_Door_Floor.mp4</div>
+          <div class="plat-links"><a href="#" class="plat-link youtube">▶ YouTube</a><a href="#" class="plat-link instagram">◆ Instagram</a></div>
+        </div>
+      </div>
+    </div>
+    <div id="worst-youtube" class="plat-cards" style="display:none">
+      <div class="card card-bottom">
+        <div class="card-header"><span class="rank-label">#1 Needs Work</span><div style="text-align:right"><span class="overall-score" style="color:#ff5252">9/100</span><div class="score-sublabel">YouTube score</div></div></div>
+        <div class="card-body">
+          <div class="caption">"Goofed up burnout anthem. Alive (not dead) by Daphnie"</div>
+          <div class="meta">🎵 Alive &nbsp;·&nbsp; 📅 5 Jun 2026 &nbsp;·&nbsp; 162 views · 9 likes</div>
+          <div class="plat-links"><a href="#" class="plat-link youtube">▶ YouTube</a></div>
+        </div>
+      </div>
+    </div>
+    <div id="worst-instagram" class="plat-cards" style="display:none">
+      <div class="card card-bottom">
+        <div class="card-header"><span class="rank-label">#1 Needs Work</span><div style="text-align:right"><span class="overall-score" style="color:#ff5252">8/100</span><div class="score-sublabel">Instagram score</div></div></div>
+        <div class="card-body">
+          <div class="caption">"Goofed up burnout anthem. Alive (not dead) by Daphnie"</div>
+          <div class="meta">🎵 Alive &nbsp;·&nbsp; 📅 5 Jun 2026 &nbsp;·&nbsp; 248 plays · 11 likes</div>
+          <div class="plat-links"><a href="#" class="plat-link instagram">◆ Instagram</a></div>
+        </div>
+      </div>
+    </div>
+    <div id="worst-tiktok" class="plat-cards" style="display:none">
+      <div class="card card-bottom">
+        <div class="card-header"><span class="rank-label">#1 Needs Work</span><div style="text-align:right"><span class="overall-score" style="color:#ff5252">12/100</span><div class="score-sublabel">TikTok score</div></div></div>
+        <div class="card-body">
+          <div class="caption">"Goofed up burnout anthem. Alive (not dead) by Daphnie"</div>
+          <div class="meta">🎵 Alive &nbsp;·&nbsp; 📅 5 Jun 2026 &nbsp;·&nbsp; 410 views · 24 likes</div>
+          <div class="plat-links"><a href="#" class="plat-link tiktok">♪ TikTok</a></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px">
+      <h2 style="margin:0">&#128202; All Posts</h2>
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <button class="filter-btn" id="btn-ranked" onclick="toggleRanked()" style="color:var(--muted)">Ranked Score</button>
+        <div id="outlier-switch" onclick="toggleOutliers()" style="display:flex;align-items:center;gap:0;border:1px solid var(--border);border-radius:100px;overflow:hidden;opacity:0.4;pointer-events:none;cursor:pointer">
+          <span style="padding:6px 12px;font-size:11px;color:var(--muted);letter-spacing:0.08em;background:var(--surface2);cursor:pointer;font-weight:600;border-right:1px solid var(--border)">OUTLIERS</span>
+          <span id="btn-include" style="background:var(--surface2);color:var(--text);padding:6px 12px;font-size:11px;letter-spacing:0.06em">Include</span>
+          <span id="btn-exclude" style="background:transparent;color:var(--muted);padding:6px 12px;font-size:11px;letter-spacing:0.06em">Exclude</span>
+        </div>
+        <span style="color:var(--border)">|</span>
+        <span style="color:var(--muted);font-size:11px;letter-spacing:0.06em">SORT BY</span>
+        <button class="filter-btn" id="sort-song" onclick="sortTable('song')">Song</button>
+        <button class="filter-btn active" id="sort-date" onclick="sortTable('date')">Date ↓</button>
+      </div>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Post</th>
+          <th style="cursor:pointer;user-select:none" onclick="sortTable('youtube')">&#9654; YouTube <span id="sort-ind-youtube"></span></th>
+          <th style="cursor:pointer;user-select:none" onclick="sortTable('instagram')">&#9670; Instagram <span id="sort-ind-instagram"></span></th>
+          <th style="cursor:pointer;user-select:none" onclick="sortTable('tiktok')">&#9834; TikTok <span id="sort-ind-tiktok"></span></th>
+          <th style="cursor:pointer;user-select:none" onclick="sortTable('overall')">Overall <span id="sort-ind-overall"></span></th>
+        </tr>
+      </thead>
+      <tbody id="main-tbody">
+        <!-- Rows injected by JS -->
+      </tbody>
+    </table>
+  </section>
+
+  <section style="text-align:center;padding:24px 48px;">
+    <p style="color:var(--muted);font-size:12px;">Scores weighted by platform algorithm signals: shares &amp; saves rank highest, then comments, then likes.<br>Ranked Score normalises each platform so a top YouTube performer and a top Instagram performer contribute equally to Overall.</p>
+  </section>
+</div>
+
+<script>
+const CLIENT_KEY = 'aw2r9f2oaloc9vpu';
+const REDIRECT = 'https://daphnieinsights.github.io/';
+
+// ── Demo data ─────────────────────────────────────────────────────────────
+const POSTS = [
+  {song:'28',caption:'For when your writers are on strike. 28 by Daphnie #indierock #altrock',date:'2026-06-22',time:'6:13PM',file:'28_Framed_V2.mp4',platforms:{youtube:{score:83,norm:100,url:'https://youtube.com/shorts/abc1',views:4200,likes:312,comments:28,saves:0},instagram:{score:79,norm:100,url:'https://instagram.com/reel/abc1',views:1260,likes:82,comments:4,saves:3},tiktok:{score:91,norm:100,url:'https://tiktok.com/@probablydaphnie/video/1',views:2100,likes:198,comments:22,saves:0}},overall:87},
+  {song:'Cupid',caption:'Soundtrack your next chapter. Cupid by Daphnie #indierock',date:'2026-06-19',time:'6:14PM',file:'Cupid_Door_Blue.mov',platforms:{youtube:{score:68,norm:76,url:'https://youtube.com/shorts/abc2',views:3400,likes:241,comments:19,saves:0},instagram:{score:66,norm:81,url:'https://instagram.com/reel/abc2',views:1020,likes:64,comments:3,saves:2},tiktok:{score:78,norm:84,url:'https://tiktok.com/@probablydaphnie/video/2',views:1700,likes:154,comments:15,saves:0}},overall:74},
+  {song:'28',caption:"Man's crashing out. 28 by Daphnie #indierock #altrock",date:'2026-06-17',time:'8:30PM',file:'28_Cross_Pre1.mp4',platforms:{youtube:{score:53,norm:58,url:'https://youtube.com/shorts/abc3',views:2300,likes:187,comments:14,saves:0},instagram:{score:51,norm:62,url:'https://instagram.com/reel/abc3',views:690,likes:48,comments:3,saves:1},tiktok:{score:63,norm:67,url:'https://tiktok.com/@probablydaphnie/video/3',views:1150,likes:112,comments:10,saves:0}},overall:61},
+  {song:'Cupid',caption:'For dancing in your bedroom. Cupid by Daphnie #indierock',date:'2026-06-14',time:'6:14PM',file:'Cupid_CA_Door.mov',platforms:{youtube:{score:47,norm:51,url:'https://youtube.com/shorts/abc4',views:1800,likes:143,comments:11,saves:0},instagram:{score:42,norm:51,url:'https://instagram.com/reel/abc4',views:540,likes:38,comments:2,saves:1},tiktok:{score:52,norm:55,url:'https://tiktok.com/@probablydaphnie/video/4',views:900,likes:87,comments:7,saves:0}},overall:55},
+  {song:'28',caption:'Do something different. 28 by Daphnie #indierock #altrock',date:'2026-06-11',time:'6:13PM',file:'28_Door_V2B.mp4',platforms:{youtube:{score:37,norm:39,url:'https://youtube.com/shorts/abc5',views:1560,likes:98,comments:8,saves:0},instagram:{score:33,norm:40,url:'https://instagram.com/reel/abc5',views:468,likes:24,comments:2,saves:0},tiktok:{score:41,norm:43,url:'https://tiktok.com/@probablydaphnie/video/5',views:780,likes:61,comments:5,saves:0}},overall:41},
+  {song:'Stay Long',caption:'To dance in your bedroom to. stay long by Daphnie #bedroompop',date:'2026-06-10',time:'9:30AM',file:'Stay_Long_V2C.mov',platforms:{youtube:{score:44,norm:48,url:'https://youtube.com/shorts/abc6',views:1100,likes:62,comments:5,saves:0},instagram:{score:39,norm:47,url:'https://instagram.com/reel/abc6',views:390,likes:21,comments:2,saves:1},tiktok:{score:48,norm:51,url:'https://tiktok.com/@probablydaphnie/video/6',views:640,likes:44,comments:4,saves:0}},overall:46},
+  {song:'28',caption:'Stuff is better when it\'s worse. 28 by Daphnie #indierock',date:'2026-06-08',time:'6:14PM',file:'28_Couch_GTR.mp4',platforms:{youtube:{score:32,norm:33,url:'https://youtube.com/shorts/abc7',views:1240,likes:76,comments:5,saves:0},instagram:{score:29,norm:35,url:'https://instagram.com/reel/abc7',views:372,likes:18,comments:1,saves:0},tiktok:{score:35,norm:36,url:'https://tiktok.com/@probablydaphnie/video/7',views:620,likes:43,comments:3,saves:0}},overall:33},
+  {song:'Alive',caption:'For if you need to revamp your aura. Alive (not dead) by Daphnie',date:'2026-06-08',time:'9:30AM',file:'Alive_Walk_Night.mov',platforms:{youtube:{score:27,norm:27,url:'https://youtube.com/shorts/abc8',views:1089,likes:13,comments:2,saves:0},instagram:{score:24,norm:29,url:'https://instagram.com/reel/abc8',views:310,likes:14,comments:1,saves:0}},overall:26},
+  {song:'Claps',caption:'Do something different for no reason. This Song Has Claps In It by Daphnie',date:'2026-06-06',time:'6:14PM',file:'Claps_Cup_C1.mov',platforms:{youtube:{score:22,norm:21,url:'https://youtube.com/shorts/abc9',views:910,likes:21,comments:2,saves:0},instagram:{score:20,norm:24,url:'https://instagram.com/reel/abc9',views:280,likes:12,comments:1,saves:0}},overall:21},
+  {song:'Stay Long',caption:'Soundtrack your next era. stay long by Daphnie #bedroompop',date:'2026-06-05',time:'9:30AM',file:'Stay_Long_V1B.mov',platforms:{youtube:{score:19,norm:18,url:'https://youtube.com/shorts/abc10',views:720,likes:16,comments:1,saves:0},instagram:{score:17,norm:21,url:'https://instagram.com/reel/abc10',views:220,likes:9,comments:1,saves:0}},overall:19},
+  {song:'Alive',caption:'Goofed up burnout anthem. Alive (not dead) by Daphnie #indiepop',date:'2026-06-05',time:'6:13PM',file:'Alive_Floor_Blue.mp4',platforms:{youtube:{score:14,norm:12,url:'https://youtube.com/shorts/abc11',views:820,likes:9,comments:0,saves:0},instagram:{score:11,norm:13,url:'https://instagram.com/reel/abc11',views:248,likes:11,comments:1,saves:0}},overall:13},
+  {song:'Claps',caption:'For TV characters with no script. This Song Has Claps In It by Daphnie',date:'2026-06-03',time:'9:30AM',file:'Claps_Mirror_V1.mp4',platforms:{youtube:{score:9,norm:6,url:'https://youtube.com/shorts/abc12',views:439,likes:17,comments:2,saves:0},instagram:{score:8,norm:9,url:'https://instagram.com/reel/abc12',views:185,likes:7,comments:0,saves:0}},overall:8},
+];
+
+let currentSort = 'date';
+let secondarySort = 'overall';
+let sortAsc = false;
+let currentFilter = 'all';
+let showRanked = false;
+let excludeOutliers = true;
+
+// ── Render table rows ──────────────────────────────────────────────────────
+function scoreColour(val, allVals) {
+  const filtered = allVals.filter(v => v > 0);
+  if (!filtered.length) return '#888';
+  const mn = Math.min(...filtered), mx = Math.max(...filtered);
+  if (mx === mn) return '#ffeb3b';
+  const pct = (val - mn) / (mx - mn);
+  return pct >= 0.66 ? '#00e676' : pct >= 0.33 ? '#ffeb3b' : '#ff5252';
+}
+
+function buildRows() {
+  const allOverall = POSTS.map(p => p.overall);
+  const allYt = POSTS.map(p => p.platforms.youtube?.score || 0);
+  const allIg = POSTS.map(p => p.platforms.instagram?.score || 0);
+  const allTt = POSTS.map(p => p.platforms.tiktok?.score || 0);
+
+  return POSTS.map(p => {
+    const yt = p.platforms.youtube;
+    const ig = p.platforms.instagram;
+    const tt = p.platforms.tiktok;
+    const ytScore = yt?.score || 0, igScore = ig?.score || 0, ttScore = tt?.score || 0;
+    const ytNorm = yt?.norm || 0, igNorm = ig?.norm || 0, ttNorm = tt?.norm || 0;
+    const col = scoreColour(p.overall, allOverall);
+
+    const ytCell = yt ? `<td>
+      <a href="${yt.url}" target="_blank" class="post-link">youtube.com/shorts ↗</a>
+      <div class="mini-stats"><span>👁 ${yt.views.toLocaleString()}</span><span>♥ ${yt.likes}</span><span>💬 ${yt.comments}</span></div>
+      <div class="score-wrap"><span class="plat-score" style="color:${scoreColour(ytScore,allYt)}">${ytScore}/100</span><div class="bar-bg"><div class="bar" style="width:${ytScore}%;background:${scoreColour(ytScore,allYt)}"></div></div></div>
+    </td>` : '<td class="na">—</td>';
+
+    const igCell = ig ? `<td>
+      <a href="${ig.url}" target="_blank" class="post-link">instagram.com/reel ↗</a>
+      <div class="mini-stats"><span>▶ ${ig.views.toLocaleString()}</span><span>♥ ${ig.likes}</span><span>🔖 ${ig.saves}</span></div>
+      <div class="score-wrap"><span class="plat-score" style="color:${scoreColour(igScore,allIg)}">${igScore}/100</span><div class="bar-bg"><div class="bar" style="width:${igScore}%;background:${scoreColour(igScore,allIg)}"></div></div></div>
+    </td>` : '<td class="na">—</td>';
+
+    const ttCell = tt ? `<td>
+      <a href="${tt.url}" target="_blank" class="post-link">tiktok.com ↗</a>
+      <div class="mini-stats"><span>👁 ${tt.views.toLocaleString()}</span><span>♥ ${tt.likes}</span><span>💬 ${tt.comments}</span></div>
+      <div class="score-wrap"><span class="plat-score" style="color:${scoreColour(ttScore,allTt)}">${ttScore}/100</span><div class="bar-bg"><div class="bar" style="width:${ttScore}%;background:${scoreColour(ttScore,allTt)}"></div></div></div>
+    </td>` : '<td class="na">—</td>';
+
+    const plats = Object.keys(p.platforms).join(' ');
+
+    return `<tr data-platforms="${plats}" data-date="${p.date} ${p.time}" data-song="${p.song}" data-overall="${p.overall}" data-youtube="${ytScore}" data-instagram="${igScore}" data-tiktok="${ttScore}" data-yt-norm="${ytNorm}" data-ig-norm="${igNorm}" data-tt-norm="${ttNorm}">
+      <td>
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div class="thumb-ph"></div>
+          <div>
+            <div class="caption-cell">${p.caption}</div>
+            <div class="song-cell">🎵 ${p.song}</div>
+            <div class="date-cell">📅 ${p.date.slice(5)} · ${p.time} &nbsp;·&nbsp; 🎬 ${p.file}</div>
+          </div>
+        </div>
+      </td>
+      ${ytCell}${igCell}${ttCell}
+      <td><span class="overall-badge" style="background:${col}20;color:${col};border:1px solid ${col}40">${p.overall}/100</span></td>
+    </tr>`;
+  }).join('');
+}
+
+document.getElementById('main-tbody').innerHTML = buildRows();
+
+// ── Platform filter ────────────────────────────────────────────────────────
+function filterPlatform(btn, platform) {
+  document.querySelectorAll('.filter-btn[onclick^="filterPlatform"]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentFilter = platform;
+
+  document.querySelectorAll('#main-tbody tr[data-overall]').forEach(row => {
+    const plats = row.getAttribute('data-platforms') || '';
+    row.classList.toggle('hidden', platform !== 'all' && !plats.includes(platform));
+  });
+
+  document.querySelectorAll('.plat-cards').forEach(el => el.style.display = 'none');
+  document.getElementById('best-' + platform).style.display = '';
+  document.getElementById('worst-' + platform).style.display = '';
+}
+
+// ── Ranked Score ──────────────────────────────────────────────────────────
+function toggleRanked() {
+  showRanked = !showRanked;
+  const btn = document.getElementById('btn-ranked');
+  btn.classList.toggle('active', showRanked);
+  if (currentSort === 'song') refreshSongGroups();
+  updateScoreDisplay();
+}
+
+function updateScoreDisplay() {
+  document.querySelectorAll('#main-tbody tr[data-overall]').forEach(row => {
+    const cells = row.querySelectorAll('td');
+    [['youtube',1,'data-youtube','data-yt-norm'],['instagram',2,'data-instagram','data-ig-norm'],['tiktok',3,'data-tiktok','data-tt-norm']].forEach(([,idx,raw,norm]) => {
+      if (cells[idx]) {
+        const sp = cells[idx].querySelector('.plat-score');
+        if (sp) {
+          const val = parseFloat(row.getAttribute(showRanked ? norm : raw) || 0);
+          sp.textContent = val > 0 ? val.toFixed(1) + '/100' : '—';
+        }
+      }
+    });
+  });
+}
+
+// ── Outliers ──────────────────────────────────────────────────────────────
+function getIQRRows(rows, attr) {
+  const vals = rows.map(r => parseFloat(r.getAttribute(attr)||0)).filter(v=>v>0).sort((a,b)=>a-b);
+  if (vals.length < 4) return rows;
+  const q1=vals[Math.floor(vals.length*0.25)], q3=vals[Math.floor(vals.length*0.75)];
+  const iqr=q3-q1, lo=q1-1.5*iqr, hi=q3+1.5*iqr;
+  return rows.filter(r=>{ const v=parseFloat(r.getAttribute(attr)||0); return v===0||(v>=lo&&v<=hi); });
+}
+
+function toggleOutliers() {
+  excludeOutliers = !excludeOutliers;
+  document.getElementById('btn-include').style.background = !excludeOutliers ? 'var(--surface2)' : 'transparent';
+  document.getElementById('btn-include').style.color = !excludeOutliers ? 'var(--text)' : 'var(--muted)';
+  document.getElementById('btn-exclude').style.background = excludeOutliers ? 'var(--surface2)' : 'transparent';
+  document.getElementById('btn-exclude').style.color = excludeOutliers ? 'var(--text)' : 'var(--muted)';
+  if (currentSort === 'song') {
+    const tbody = document.getElementById('main-tbody');
+    const allRows = Array.from(tbody.querySelectorAll('tr[data-overall]'));
+    const groups = {};
+    allRows.forEach(r => { const s=r.getAttribute('data-song')||''; if(!groups[s])groups[s]=[]; groups[s].push(r); });
+    Object.values(groups).forEach(sRows => {
+      const kept = new Set(getIQRRows(sRows, 'data-overall'));
+      sRows.forEach(r => r.classList.toggle('hidden', excludeOutliers && !kept.has(r)));
+    });
+    refreshSongGroups();
+  }
+}
+
+// ── Sort ──────────────────────────────────────────────────────────────────
+function sortTable(key) {
+  const tbody = document.getElementById('main-tbody');
+  const rows = Array.from(tbody.querySelectorAll('tr[data-overall]'));
+
+  // Secondary sort when in song mode
+  if (currentSort === 'song' && ['youtube','instagram','tiktok','overall'].includes(key)) {
+    if (secondarySort === key) sortAsc = !sortAsc; else { secondarySort = key; sortAsc = false; }
+    refreshSongGroups();
+    ['youtube','instagram','tiktok','overall'].forEach(k => { const el=document.getElementById('sort-ind-'+k); if(el)el.textContent=k===key?(sortAsc?' ↑':' ↓'):''; });
+    return;
+  }
+
+  if (currentSort === key) sortAsc = !sortAsc;
+  else { sortAsc = key==='song'; currentSort = key; if(key!=='song')secondarySort='overall'; }
+
+  // Enable/disable outlier switch
+  const sw = document.getElementById('outlier-switch');
+  sw.style.opacity = key==='song' ? '1' : '0.4';
+  sw.style.pointerEvents = key==='song' ? 'auto' : 'none';
+  if (key !== 'song') rows.forEach(r => r.classList.remove('hidden'));
+
+  rows.sort((a,b) => {
+    let va=a.getAttribute('data-'+key)||'', vb=b.getAttribute('data-'+key)||'';
+    if (key==='date') return sortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
+    const na=parseFloat(va), nb=parseFloat(vb);
+    if (!isNaN(na)&&!isNaN(nb)) { if(na===0&&nb!==0)return 1; if(nb===0&&na!==0)return -1; return sortAsc?na-nb:nb-na; }
+    return sortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
+  });
+
+  while (tbody.firstChild) tbody.removeChild(tbody.firstChild);
+
+  if (key === 'song') {
+    const groups = {};
+    rows.forEach(r => { const s=r.getAttribute('data-song')||''; if(!groups[s])groups[s]=[]; groups[s].push(r); });
+    const names = Object.keys(groups).sort((a,b) => {
+      const avg = srows => { const kept=excludeOutliers?getIQRRows(srows,'data-overall'):srows; const vals=kept.map(r=>parseFloat(r.getAttribute('data-overall')||0)).filter(v=>v>0); return vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:0; };
+      const diff = avg(groups[b]) - avg(groups[a]);
+      return sortAsc ? -diff : diff;
+    });
+    names.forEach(song => {
+      const sRows = groups[song];
+      const active = excludeOutliers ? getIQRRows(sRows,'data-overall') : sRows;
+      const avg = (raw, norm) => { const attr=showRanked&&norm?norm:raw; const vals=active.map(r=>parseFloat(r.getAttribute(attr)||0)).filter(v=>v>0); return vals.length?(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1):'—'; };
+      const nEx = sRows.length - active.length;
+      const exNote = excludeOutliers && nEx > 0 ? ` <span style="font-size:10px;color:var(--muted);font-weight:400">(${nEx} outlier${nEx>1?'s':''} excluded)</span>` : '';
+      const hdr = document.createElement('tr');
+      hdr.className = 'song-header-row';
+      hdr.innerHTML = `<td style="background:var(--surface2);padding:12px 14px;border-radius:4px 0 0 4px"><span style="color:var(--text);font-weight:600;font-size:13px;letter-spacing:0.06em">🎵 ${song.toUpperCase()}</span>${exNote}</td><td style="background:var(--surface2);padding:12px 14px;font-size:13px;color:var(--yt);font-weight:600">avg ${avg('data-youtube','data-yt-norm')}/100</td><td style="background:var(--surface2);padding:12px 14px;font-size:13px;color:var(--ig);font-weight:600">avg ${avg('data-instagram','data-ig-norm')}/100</td><td style="background:var(--surface2);padding:12px 14px;font-size:13px;color:var(--tt);font-weight:600">avg ${avg('data-tiktok','data-tt-norm')}/100</td><td style="background:var(--surface2);padding:12px 14px;border-radius:0 4px 4px 0;font-size:13px;color:var(--accent);font-weight:600">avg ${avg('data-overall',null)}/100</td>`;
+      tbody.appendChild(hdr);
+      const secAttr = secondarySort==='youtube'?'data-youtube':secondarySort==='instagram'?'data-instagram':secondarySort==='tiktok'?'data-tiktok':'data-overall';
+      const sorted = [...sRows].sort((a,b)=>{ const va=parseFloat(a.getAttribute(secAttr)||0), vb=parseFloat(b.getAttribute(secAttr)||0); if(va===0&&vb!==0)return 1; if(vb===0&&va!==0)return-1; return sortAsc?va-vb:vb-va; });
+      sorted.forEach(r => tbody.appendChild(r));
+    });
+  } else {
+    rows.forEach(r => tbody.appendChild(r));
+  }
+
+  // Update sort indicators
+  ['youtube','instagram','tiktok','overall','song','date'].forEach(k => { const el=document.getElementById('sort-ind-'+k); if(el)el.textContent=''; });
+  const ind = document.getElementById('sort-ind-'+key);
+  if (ind) ind.textContent = sortAsc ? ' ↑' : ' ↓';
+  const db=document.getElementById('sort-date'), sb=document.getElementById('sort-song');
+  db.textContent = 'Date' + (key==='date'?(sortAsc?' ↑':' ↓'):'');
+  sb.textContent = 'Song' + (key==='song'?(sortAsc?' ↑':' ↓'):'');
+  db.classList.toggle('active', key==='date');
+  sb.classList.toggle('active', key==='song');
+  updateScoreDisplay();
+}
+
+function refreshSongGroups() {
+  const tbody = document.getElementById('main-tbody');
+  const rows = Array.from(tbody.querySelectorAll('tr[data-overall]'));
+  while (tbody.firstChild) tbody.removeChild(tbody.firstChild);
+  const groups = {};
+  rows.forEach(r => { const s=r.getAttribute('data-song')||''; if(!groups[s])groups[s]=[]; groups[s].push(r); });
+  const names = Object.keys(groups).sort((a,b)=>{ const avg=srows=>{const kept=excludeOutliers?getIQRRows(srows,'data-overall'):srows;const vals=kept.map(r=>parseFloat(r.getAttribute('data-overall')||0)).filter(v=>v>0);return vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:0;};return sortAsc?avg(groups[a])-avg(groups[b]):avg(groups[b])-avg(groups[a]); });
+  names.forEach(song => {
+    const sRows=groups[song], active=excludeOutliers?getIQRRows(sRows,'data-overall'):sRows;
+    const avg=(raw,norm)=>{const attr=showRanked&&norm?norm:raw;const vals=active.map(r=>parseFloat(r.getAttribute(attr)||0)).filter(v=>v>0);return vals.length?(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1):'—';};
+    const nEx=sRows.length-active.length, exNote=excludeOutliers&&nEx>0?` <span style="font-size:10px;color:var(--muted);font-weight:400">(${nEx} outlier${nEx>1?'s':''} excluded)</span>`:'';
+    const hdr=document.createElement('tr'); hdr.className='song-header-row';
+    hdr.innerHTML=`<td style="background:var(--surface2);padding:12px 14px;border-radius:4px 0 0 4px"><span style="color:var(--text);font-weight:600;font-size:13px;letter-spacing:0.06em">🎵 ${song.toUpperCase()}</span>${exNote}</td><td style="background:var(--surface2);padding:12px 14px;font-size:13px;color:var(--yt);font-weight:600">avg ${avg('data-youtube','data-yt-norm')}/100</td><td style="background:var(--surface2);padding:12px 14px;font-size:13px;color:var(--ig);font-weight:600">avg ${avg('data-instagram','data-ig-norm')}/100</td><td style="background:var(--surface2);padding:12px 14px;font-size:13px;color:var(--tt);font-weight:600">avg ${avg('data-tiktok','data-tt-norm')}/100</td><td style="background:var(--surface2);padding:12px 14px;border-radius:0 4px 4px 0;font-size:13px;color:var(--accent);font-weight:600">avg ${avg('data-overall',null)}/100</td>`;
+    tbody.appendChild(hdr);
+    const secAttr=secondarySort==='youtube'?'data-youtube':secondarySort==='instagram'?'data-instagram':secondarySort==='tiktok'?'data-tiktok':'data-overall';
+    const sorted=[...sRows].sort((a,b)=>{const va=parseFloat(a.getAttribute(secAttr)||0),vb=parseFloat(b.getAttribute(secAttr)||0);if(va===0&&vb!==0)return 1;if(vb===0&&va!==0)return-1;return sortAsc?va-vb:vb-va;});
+    sorted.forEach(r=>tbody.appendChild(r));
+  });
+  updateScoreDisplay();
+}
+
+// ── TikTok OAuth ──────────────────────────────────────────────────────────
+function doLogin(e) {
+  e.preventDefault();
+  window.location.href = 'https://www.tiktok.com/v2/auth/authorize/?client_key=' + CLIENT_KEY +
+    '&scope=video.list,user.info.basic&response_type=code&redirect_uri=' + encodeURIComponent(REDIRECT);
+}
+
+const params = new URLSearchParams(window.location.search);
+if (params.get('code')) {
+  document.getElementById('connectSuccess').classList.add('visible');
+  const btn = document.getElementById('tiktokBtn');
+  btn.innerHTML = '✓ &nbsp;TikTok Connected';
+  btn.style.background = '#16a34a';
+  btn.style.color = '#fff';
+  btn.onclick = null;
+  window.history.replaceState({}, document.title, window.location.pathname);
+}
+
+// Default sort on load
+sortTable('date');
+</script>
+</body>
+</html>
