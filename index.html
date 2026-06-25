@@ -153,11 +153,11 @@
   <div class="connect-hero">
     <div>
       <h1>See what's working<span>.</span><br>Across every platform.</h1>
-      <p>Connect TikTok to unlock cross-platform insights across TikTok, Instagram, and YouTube — all in one place. Daphnie Insights automatically matches your recent posts across platforms by publish time, so you can see which songs, clips, and captions actually drive engagement.</p>
+      <p>Connect your accounts to unlock cross-platform insights across TikTok, Instagram, and YouTube — all in one place. Daphnie Insights automatically matches your recent posts across platforms by publish time, so you can see which songs, clips, and captions actually drive engagement.</p>
       <ul class="perm-list">
         <li>
           <div class="perm-icon">📊</div>
-          <div class="perm-text"><strong>Read your recent video stats</strong><span>Views, likes, comments and shares for your most recent TikTok videos. Used to build your performance report.</span></div>
+          <div class="perm-text"><strong>Read your recent video stats</strong><span>Views, likes, comments and shares for your most recent videos. Used to build your performance report.</span></div>
         </li>
         <li>
           <div class="perm-icon">🔗</div>
@@ -165,7 +165,7 @@
         </li>
         <li>
           <div class="perm-icon">🔒</div>
-          <div class="perm-text"><strong>Verify your identity</strong><span>Confirms which TikTok account you're connecting. No private messages, followers, or DMs are accessed.</span></div>
+          <div class="perm-text"><strong>Verify your identity</strong><span>Confirms which account you're connecting. No private messages, followers, or DMs are accessed.</span></div>
         </li>
         <li>
           <div class="perm-icon">🚫</div>
@@ -186,7 +186,7 @@
         </div>
         <div>
           <h3>Daphnie Insights</h3>
-          <p>Connect TikTok to match your posts across platforms</p>
+          <p>Connect your accounts to get started</p>
         </div>
       </div>
 
@@ -237,7 +237,7 @@
 
 <!-- INSIGHTS DASHBOARD -->
 <div class="insights-wrap" id="dashboard">
-  <div style="background:rgba(200,255,0,0.04);border-bottom:1px solid rgba(200,255,0,0.12);padding:12px 48px;display:flex;align-items:center;gap:10px;font-size:12px;color:var(--muted);">
+  <div id="match-banner" style="display:none;background:rgba(200,255,0,0.04);border-bottom:1px solid rgba(200,255,0,0.12);padding:12px 48px;align-items:center;gap:10px;font-size:12px;color:var(--muted);">
     <span style="color:var(--accent)">✓</span>
     <span>Found <strong style="color:var(--text)">12 posts</strong> matched across TikTok, YouTube &amp; Instagram — videos published within 6 hours of each other on different platforms are grouped as the same clip.</span>
   </div>
@@ -695,6 +695,8 @@ if (params.get('code')) {
   btn.style.color = '#fff';
   btn.onclick = null;
   window.history.replaceState({}, document.title, window.location.pathname);
+  const banner = document.getElementById('match-banner');
+  if (banner) { banner.style.display = 'flex'; }
 }
 
 // Default sort on load
